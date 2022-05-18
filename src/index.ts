@@ -8,7 +8,7 @@ const {
 const { JsonRpcProvider } = require("@ethersproject/providers");
 const createDebug = require("debug");
 const debug = createDebug("bb:demo");
-import { depositTokensToAztec } from "./shield";
+import { depositTokensToAztec, depositEthToAztec } from "./shield";
 import { ethers } from "ethers";
 require("dotenv").config();
 
@@ -49,24 +49,22 @@ const main = async () => {
   await sdk.awaitSynchronised();
   const user = await sdk.addUser(AZTEC_PRIVATE_KEY);
 
-  const depositTokenQuantity: bigint = sdk.toBaseUnits(0, "0.01"); // 0.01 ETH
+  const depositTokenQuantity: bigint = ethers.utils.parseEther("0.01").toBigInt();
+  // sdk.toBaseUnits(0, "0.01"); // 0.01 ETH
+  
 
   // Last deposit pays for instant rollup to flush.
   const depositSettlementTime = TxSettlementTime.NEXT_ROLLUP;
-  const depositTokenAddress = EthAddress.ZERO // ETH
+  // const depositTokenAddress = EthAddress.ZERO // ETH
 
-  await depositTokensToAztec(
+  await depositEthToAztec(
     ETHEREUM_ADDRESS,
     user.id,
-    depositTokenAddress,
     depositTokenQuantity,
     depositSettlementTime,
     sdk,
     walletProvider
   );
-
-  console.log("user", user);
-  console.log("done");
 };
 
 main();
