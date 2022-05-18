@@ -2,22 +2,10 @@ import {
   AccountId,
   AssetValue,
   AztecSdk,
-  BridgeId,
-  DefiSettlementTime,
   EthAddress,
   TxSettlementTime,
   WalletProvider,
-  createAztecSdk,
-  EthersAdapter,
 } from "@aztec/sdk";
-
-const { JsonRpcProvider } = require("@ethersproject/providers");
-const { ethers } = require("ethers");
-const createDebug = require("debug");
-const debug = createDebug("bb:demo");
-require("dotenv").config();
-
-let userId, sdk;
 
 export async function depositEthToAztec(
   usersEthereumAddress: EthAddress,

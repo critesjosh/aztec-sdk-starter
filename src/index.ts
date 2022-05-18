@@ -1,16 +1,18 @@
-const {
+import {
   createAztecSdk,
   WalletProvider,
   EthersAdapter,
   EthAddress,
   TxSettlementTime
-} = require("@aztec/sdk");
-const { JsonRpcProvider } = require("@ethersproject/providers");
-const createDebug = require("debug");
-const debug = createDebug("bb:demo");
+} from "@aztec/sdk";
+import { JsonRpcProvider } from "@ethersproject/providers";
 import { depositTokensToAztec, depositEthToAztec } from "./shield";
 import { ethers } from "ethers";
+
 require("dotenv").config();
+const createDebug = require("debug");
+const debug = createDebug("bb:demo");
+
 
 const ETHEREUM_ADDRESS = EthAddress.fromString(
   ethers.utils.computeAddress(Buffer.from(process.env.ETHEREUM_PRIVATE_KEY, "hex"))
@@ -23,19 +25,6 @@ const ethereumProvider = new EthersAdapter(ethersProvider);
 const walletProvider = new WalletProvider(ethereumProvider);
 walletProvider.addAccount(Buffer.from(process.env.ETHEREUM_PRIVATE_KEY, "hex"));
 let sdk;
-
-// export const setupSdk = async () => {
-//   sdk = await createAztecSdk(walletProvider, {
-//     serverUrl: process.env.ROLLUP_HOST,
-//     pollInterval: 1000,
-//     memoryDb: true,
-//     minConfirmation: 1, // ETH block confirmations
-//   });
-
-//   await sdk.run();
-//   await sdk.awaitSynchronised();
-//   return sdk;
-// };
 
 const main = async () => {
   sdk = await createAztecSdk(walletProvider, {
