@@ -26,6 +26,17 @@ export async function createPrivacyKey(
   return { privateKey, publicKey };
 }
 
+export async function createArbitraryDeterministicKey(
+  provider: WalletProvider,
+  sdk: AztecSdk,
+  message: string
+) {
+  const messageToSign = Buffer.from(message);
+  const privateKey = await createSigningKey(provider, messageToSign);
+  const publicKey = await sdk.derivePublicKey(privateKey);
+  return { privateKey, publicKey };
+}
+
 const createSigningKey = async (provider: WalletProvider, message: Buffer) => {
   const signer = new Web3Signer(provider);
   const ethAddress = provider.getAccount(0);
