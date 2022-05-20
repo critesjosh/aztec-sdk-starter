@@ -4,7 +4,7 @@
 
 1. Node
 2. Yarn
-3. Goerli ETH
+3. Aztec mainnet fork ETH. There isn't a faucet right now, but reach out to me on twitter (@critesjosh_) or discord (joshc#0001) and I'll send you some.
 
 ## Run
 
@@ -14,7 +14,7 @@ Install dependencies
 yarn
 ```
 
-Runs script
+Runs script, `./src/index.ts`:
 
 ```shell
 yarn go
@@ -22,11 +22,9 @@ yarn go
 
 ## Environment
 
-The script currently runs on the Goerli testnet and corresponding Aztec testnet.
+The script currently runs on a fork of Ethereum mainnet run by Aztec.
 
-Get Goerli ETH here. https://www.faucet.paradigm.xyz/
-
-You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-testnet/falafel/status
+You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-dev/falafel/status
 
 ## Debug
 
