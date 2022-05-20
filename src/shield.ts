@@ -3,6 +3,7 @@ import {
   AssetValue,
   AztecSdk,
   EthAddress,
+  SchnorrSigner,
   TxSettlementTime,
   WalletProvider,
 } from "@aztec/sdk";
@@ -13,12 +14,9 @@ export async function depositEthToAztec(
   tokenQuantity: bigint,
   settlementTime: TxSettlementTime,
   sdk: AztecSdk,
-  provider: WalletProvider
+  signer: SchnorrSigner
 ) {
   const tokenAssetId = sdk.getAssetIdBySymbol('ETH');
-  const signer = await sdk.createSchnorrSigner(
-    provider.getPrivateKeyForAddress(usersEthereumAddress)!
-  );
   const tokenDepositFee = (await sdk.getDepositFees(tokenAssetId))[
     settlementTime
   ];
@@ -40,7 +38,6 @@ export async function depositEthToAztec(
   await tokenDepositController.send();
   // await tokenDepositController.awaitSettlement();
   return tokenDepositController;
-
 }
 
 export async function depositTokensToAztec(
@@ -50,13 +47,10 @@ export async function depositTokensToAztec(
   tokenQuantity: bigint,
   settlementTime: TxSettlementTime,
   sdk: AztecSdk,
-  provider: WalletProvider
+  signer: SchnorrSigner
 ) {
   const tokenAssetId = sdk.getAssetIdByAddress(token);
   // ^ can also use sdk.getAssetIdBySymbol('DAI');
-  const signer = await sdk.createSchnorrSigner(
-    provider.getPrivateKeyForAddress(usersEthereumAddress)!
-  );
   const tokenDepositFee = (await sdk.getDepositFees(tokenAssetId))[
     settlementTime
   ];
