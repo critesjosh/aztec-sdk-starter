@@ -1,14 +1,17 @@
 import {
   AccountId,
   AztecSdk,
+  AztecSdkUser,
   BridgeId,
   createAztecSdk,
-  WalletProvider,
+  DefiSettlementTime,
   EthersAdapter,
   EthAddress,
   EthereumProvider,
+  GrumpkinAddress,
   SchnorrSigner,
   TxSettlementTime,
+  WalletProvider,
 } from "@aztec/sdk";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { createAccount } from "./createAccount";
@@ -20,7 +23,8 @@ import {
   createPrivacyKey,
   createSpendingKey,
   createArbitraryDeterministicKey,
-} from "./createAztecSigningKeys";
+} from "./aztecKeys";
+import { formatAliasInput, getAliasNonce } from "./utils";
 import { ethers } from "ethers";
 import { randomBytes } from "crypto";
 
@@ -43,9 +47,17 @@ const ethersProvider = new JsonRpcProvider(process.env.MAINNET_FORK_RPC);
 const ethereumProvider: EthereumProvider = new EthersAdapter(ethersProvider);
 const walletProvider = new WalletProvider(ethereumProvider);
 walletProvider.addAccount(Buffer.from(process.env.ETHEREUM_PRIVATE_KEY, "hex"));
-let sdk: AztecSdk;
+let sdk: AztecSdk,
+  privateKey,
+  publicKey: GrumpkinAddress,
+  user0: AztecSdkUser,
+  user1: AztecSdkUser,
+  user2: AztecSdkUser,
+  signer: SchnorrSigner,
+  signer1: SchnorrSigner,
+  signer2: SchnorrSigner;
 
-const main = async () => {
+const setupSdk = async () => {
   sdk = await createAztecSdk(walletProvider, {
     serverUrl: process.env.MAINNET_FORK_ROLLUP,
     pollInterval: 1000,
@@ -55,21 +67,25 @@ const main = async () => {
 
   await sdk.run();
   await sdk.awaitSynchronised();
+};
 
+const createKeysAndInitUsers = async () => {
   // Use the ethereum account from the WalletProvider to generate Aztec keys
-  const { privateKey, publicKey } = await createPrivacyKey(walletProvider, sdk);
+  const keys = await createPrivacyKey(walletProvider, sdk);
+  privateKey = keys.privateKey;
+  publicKey = keys.publicKey;
 
   /*
-    Setup the first Aztec account from the generated privacy key
-  */
+  Setup the first Aztec account from the generated privacy key
+*/
 
   // You can generate many Aztec AccountIds from the same private key
-  const user0 = await sdk.addUser(privateKey, 0);
+  user0 = await sdk.addUser(privateKey, 0);
   const { privateKey: signingPrivateKey } = await createSpendingKey(
     walletProvider,
     sdk
   );
-  const signer = await sdk.createSchnorrSigner(privateKey);
+  signer = await sdk.createSchnorrSigner(privateKey);
   // Wait for the SDK to read & decrypt notes to get the latest balances
   await user0.awaitSynchronised();
   console.log(
@@ -86,12 +102,12 @@ const main = async () => {
   );
 
   /*
-    Setup the second Aztec account
-    This account has already been registered on zk.money
-  */
+  Setup the second Aztec account
+  This account has already been registered on zk.money
+*/
 
-  const user1 = await sdk.addUser(privateKey, 1);
-  const signer1 = await sdk.createSchnorrSigner(signingPrivateKey);
+  user1 = await sdk.addUser(privateKey, 1);
+  signer1 = await sdk.createSchnorrSigner(signingPrivateKey);
   await user1.awaitSynchronised();
   console.log(
     "user1 ETH balance",
@@ -105,26 +121,22 @@ const main = async () => {
       await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user1.id)
     )
   );
+};
 
-  // console.log(await user0.getUserData())
-  // console.log(await user1.getUserData())
-
-  const depositTokenQuantity: bigint = ethers.utils
-    .parseEther("0.01")
-    .toBigInt();
-
+const createUser2 = async () => {
   /*
     Setup a new Aztec account
   */
   const { privateKey: signer2Key } = await createArbitraryDeterministicKey(
     walletProvider,
     sdk,
-    process.env.ACCOUNT_2_MESSAGE
+    // process.env.ACCOUNT_2_MESSAGE
+    `Sign this message to generate your Aztec Spending Key. This key lets the application spend your funds on Aztec.\n\nIMPORTANT: Only sign this message if you trust the application.`
   );
-  const user2 = await sdk.addUser(privateKey, 2);
-  const signer2 = await sdk.createSchnorrSigner(signer2Key); // this can be anything. i am creating it deterministically from my ETH private key with a custom message, similar to how zk.money does it.
-  const alias2 = "joshc1"; // this is whatever you want
-  const thirdPartySigner = await sdk.createSchnorrSigner(randomBytes(32)); // This can be anything as well. It is required data to have to recover an account
+  user2 = await sdk.addUser(privateKey, 2);
+  signer2 = await sdk.createSchnorrSigner(signer2Key); // this can be anything. i am creating it deterministically from my ETH private key with a custom message, similar to how zk.money does it.
+  const alias2 = "joshc5"; // this is whatever you want
+  const thirdPartySigner = await sdk.createSchnorrSigner(randomBytes(32)); // This can be anything as well. It is required data to recover an account
   const recoveryPayloads = await sdk.generateAccountRecoveryData(
     alias2,
     publicKey,
@@ -134,6 +146,10 @@ const main = async () => {
     ]
   );
   const { recoveryPublicKey } = recoveryPayloads[0];
+  const depositTokenQuantity: bigint = ethers.utils
+    .parseEther("1000.01")
+    .toBigInt();
+
   await createAccount(
     user0.id,
     signer,
@@ -142,118 +158,129 @@ const main = async () => {
     recoveryPublicKey,
     ETH_TOKEN_ADDRESS,
     depositTokenQuantity,
-    TxSettlementTime.NEXT_ROLLUP,
+    TxSettlementTime.INSTANT,
     ETHEREUM_ADDRESS,
     sdk
   );
-  // console.log(
-  //   "user2 ETH balance",
-  //   sdk.fromBaseUnits(
-  //     await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user2.id)
-  //   )
-  // );
-  // console.log(
-  //   "user2 DAI balance",
-  //   sdk.fromBaseUnits(
-  //     await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user2.id)
-  //   )
-  // );
 
-  /*
-    Deposit assets to Aztec
-  */
+  console.log(
+    "user2 ETH balance",
+    sdk.fromBaseUnits(
+      await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user2.id)
+    )
+  );
+  console.log(
+    "user2 DAI balance",
+    sdk.fromBaseUnits(
+      await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user2.id)
+    )
+  );
+};
+
+const depositAssets = async (isEth: boolean = true) => {
+  const depositTokenQuantity: bigint = ethers.utils
+    .parseEther("1000.01")
+    .toBigInt();
 
   // use TxSettlementTime.NEXT_ROLLUP for a cheaper, slower option than TxSettlementTime.INSTANT
+  if (isEth) {
+    await depositEthToAztec(
+      ETHEREUM_ADDRESS,
+      user1.id,
+      depositTokenQuantity,
+      TxSettlementTime.NEXT_ROLLUP,
+      sdk,
+      signer1
+    );
+  } else {
+    await depositTokensToAztec(
+      ETHEREUM_ADDRESS,
+      user1.id,
+      DAI_ADDRESS,
+      depositTokenQuantity,
+      TxSettlementTime.NEXT_ROLLUP,
+      sdk,
+      signer1
+    );
+  }
+};
 
-  // await depositEthToAztec(
-  //   ETHEREUM_ADDRESS,
-  //   user1.id,
-  //   depositTokenQuantity,
-  //   TxSettlementTime.NEXT_ROLLUP,
-  //   sdk,
-  //   signer1
-  // );
-
-  // await depositTokensToAztec(
-  //   ETHEREUM_ADDRESS,
-  //   user1.id,
-  //   DAI_ADDRESS,
-  //   depositTokenQuantity,
-  //   TxSettlementTime.NEXT_ROLLUP,
-  //   sdk,
-  //   signer1
-  // );
-
-  /*
-    Aztec Transfers
-  */
-
+const transferAssets = async () => {
   const transferTokenQuantity: bigint = ethers.utils
-    .parseEther("0.01")
+    .parseEther("10.01")
     .toBigInt();
-  const aliasString = "joshc-test";
-  const alias: AccountId = await sdk.getAccountId(
-    aliasString,
-    await getAliasNonce(aliasString)
+  // const aliasString = "joshc-test";
+  // const alias: AccountId = await sdk.getAccountId(
+  //   aliasString,
+  //   await getAliasNonce(aliasString, sdk)
+  // );
+
+  await sendAsset(
+    user0.id,
+    user1.id,
+    DAI_ADDRESS, // ETH_TOKEN_ADDRESS
+    transferTokenQuantity,
+    TxSettlementTime.INSTANT,
+    sdk,
+    signer
   );
+};
 
-  // await sendAsset(
-  //   user0.id,
-  //   user1.id,
-  //   ETH_TOKEN_ADDRESS, // DAI_ADDRESS
-  //   transferTokenQuantity,
-  //   TxSettlementTime.NEXT_ROLLUP,
-  //   sdk,
-  //   signer
-  // )
-
-  /*
-    Withdraw assets from Aztec
-  */
-
+const withdrawAssets = async () => {
   const withdrawTokenQuantity: bigint = ethers.utils
     .parseEther("0.01")
     .toBigInt();
 
-  // withdrawTokens(
-  //   user0.id,
-  //   ETHEREUM_ADDRESS,
-  //   ETH_TOKEN_ADDRESS,
-  //   withdrawTokenQuantity,
-  //   TxSettlementTime.NEXT_ROLLUP,
-  //   sdk,
-  //   signer
-  // );
-
-  /*
-    Defi interaction from Aztec
-  */
-  const bridgeTokenQuantity: bigint = ethers.utils
-    .parseEther("0.01")
-    .toBigInt();
-  const bridgeAddressId = 1;
-  const ethAssetId = 0;
-  const daiAssetId = 1;
-  // const ethToDaiBridge = new BridgeId(bridgeAddressId, ethAssetId, daiAssetId);
-  // sdk.getBridgeAddressId
-  // const ethToDaiFees = await sdk.getDefiFees(ethToDaiBridge);
-
-  // let defiTx = await bridgeToDefi(
-  //   user0.id,
-  //   signer,
-  //   ethToDaiBridge,
-  //   bridgeTokenQuantity,
-  //   ethToDaiFees,
-  //   sdk
-  // );
-  // console.log(defiTx)
+  withdrawTokens(
+    user0.id,
+    ETHEREUM_ADDRESS,
+    ETH_TOKEN_ADDRESS,
+    withdrawTokenQuantity,
+    TxSettlementTime.NEXT_ROLLUP,
+    sdk,
+    signer
+  );
 };
 
+const defiInteraction = async () => {
+  const bridgeTokenQuantity: bigint = ethers.utils.parseEther("0.1").toBigInt();
+
+  // retrieved from https://api.aztec.network/aztec-connect-dev/falafel/status
+  const elementBridge = BridgeId.fromBigInt(
+    40785495301437048271833175014331070913778870844156528143330443265n // IN: DAI (1), OUT: DAI (1)
+  );
+  const ethToWstEth = BridgeId.fromBigInt(9903520314283042199192993794n); // IN: ETH (0), OUT: wstETH (2)
+  const WstEthToEth = BridgeId.fromBigInt(8589934594n); // IN: wstETH (2), OUT: ETH (0)
+  // TODO: include info about how to find input assets
+  // there are methods on the bridge to lookup asset inputs
+  // sdk.getBridgeAddressId;
+
+  // this sends 2 txs on Aztec. 1 to the bridge account, 1 from the bridge account to the defi app
+  let defiTx = await bridgeToDefi(
+    user1.id,
+    signer1,
+    ethToWstEth,
+    ETH_TOKEN_ADDRESS,
+    bridgeTokenQuantity,
+    DefiSettlementTime.NEXT_ROLLUP,
+    sdk
+  );
+  console.log(defiTx);
+};
+
+const getDefiTxs = async () => {
+  let txs = await sdk.getDefiTxs(user1.id);
+  console.log(txs);
+};
+
+async function main() {
+  await setupSdk();
+  await createKeysAndInitUsers();
+  // await createUser2();
+  // await depositAssets(false); // set to true if depositing ETH
+  // await transferAssets();
+  // await withdrawAssets();
+  // await defiInteraction();
+  await getDefiTxs();
+}
 main();
-
-const formatAliasInput = (aliasInput: string) => aliasInput.toLowerCase();
-
-const getAliasNonce = async (aliasInput: string) => {
-  const alias = formatAliasInput(aliasInput);
-  return sdk.getRemoteLatestAliasNonce(alias);
-};
