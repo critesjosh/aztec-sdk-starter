@@ -4,7 +4,7 @@
 
 1. Node
 2. Yarn
-3. Aztec mainnet fork ETH. There isn't a faucet right now, but reach out to me on twitter (@critesjosh_) or discord (joshc#0001) and I'll send you some.
+3. Goerli ETH. You can get some here. https://goerli-faucet.mudit.blog/
 
 ## Run
 
@@ -22,9 +22,9 @@ yarn go
 
 ## Environment
 
-The script currently runs on a fork of Ethereum mainnet run by Aztec.
+The script currently runs on a version of Aztec connected to the Goerli testnet.
 
-You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-dev/falafel/status
+You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-testnet/falafel/status
 
 ## Debug
 
