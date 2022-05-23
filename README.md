@@ -8,13 +8,15 @@
 
 ## Run
 
-Install dependencies
+1. Install dependencies
 
 ```shell
 yarn
 ```
 
-Runs script, `./src/index.ts`:
+2. Create your `.env` file and add your private key with Goerli ETH.
+
+3. Run script, `./src/index.ts`:
 
 ```shell
 yarn go
@@ -25,6 +27,12 @@ yarn go
 The script currently runs on a version of Aztec connected to the Goerli testnet.
 
 You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-testnet/falafel/status
+
+## Contents
+
+The `./src/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transfering and withdrawing assets (Eth and tokens) and doing interactions with Ethereum L1 defi applications (like Lido and Element).
+
+Defi interactions will not work on the Goerli testnet as the bridge contracts have not been deployed there. There is still an example of how to set up a defi interaction which will work on mainnet when Aztec Connect is launched.
 
 ## Debug
 
