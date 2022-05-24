@@ -1,5 +1,7 @@
 # Aztec SDK Reference script
 
+SDK setup and examples are in `./src/index.ts`. Configured to work with Aztec on the Goerli testnet.
+
 ## Requirements
 
 1. Node
