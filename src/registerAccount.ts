@@ -3,10 +3,10 @@ import {
   AztecSdk,
   EthAddress,
   SchnorrSigner,
-  TxSettlementTime
+  TxSettlementTime,
 } from "@aztec/sdk";
 
-export async function createAccount(
+export async function registerAccount(
   user: AccountId,
   signer: SchnorrSigner,
   alias: string,
