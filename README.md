@@ -1,4 +1,4 @@
-# dev-connect-workshop
+# Aztec SDK Reference script
 
 ## Requirements
 
