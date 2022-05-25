@@ -16,7 +16,7 @@ SDK setup and examples are in `./src/index.ts`. Configured to work with Aztec on
 yarn
 ```
 
-2. Create your `.env` file and add your private key with Goerli ETH.
+2. Create your `.env` file and add your Ethereum private key with Goerli ETH.
 
 3. Run script, `./src/index.ts`:
 
