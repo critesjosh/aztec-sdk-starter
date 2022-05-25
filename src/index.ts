@@ -47,11 +47,11 @@ const ETHEREUM_ADDRESS_1 = EthAddress.fromString(
 );
 
 const DAI_ADDRESS = EthAddress.fromString(
-  process.env.DAI_MAINNET_ADDRESS
+  process.env.DAI_ADDRESS
 );
 const ETH_TOKEN_ADDRESS = EthAddress.ZERO;
 
-const ethersProvider = new JsonRpcProvider(process.env.MAINNET_FORK_RPC);
+const ethersProvider = new JsonRpcProvider(process.env.ETHEREUM_HOST);
 const ethereumProvider: EthereumProvider = new EthersAdapter(ethersProvider);
 const walletProvider = new WalletProvider(ethereumProvider);
 walletProvider.addAccount(Buffer.from(process.env.ETHEREUM_PRIVATE_KEY, "hex"));
@@ -68,7 +68,7 @@ let sdk: AztecSdk,
 
 const setupSdk = async () => {
   sdk = await createAztecSdk(walletProvider, {
-    serverUrl: process.env.MAINNET_FORK_ROLLUP,
+    serverUrl: process.env.ROLLUP_HOST,
     pollInterval: 1000,
     memoryDb: true,
     minConfirmation: 1, // ETH block confirmations
@@ -144,7 +144,7 @@ const createNewUser = async () => {
   );
   user2 = await sdk.addUser(privateKey, 2);
   const newSigner = await sdk.createSchnorrSigner(signerKey); // this can be anything. i am creating it deterministically from my ETH private key with a custom message, similar to how zk.money does it.
-  const alias = "joshc5"; // this is whatever you want
+  const alias = "joshc1"; // this is whatever you want
   const thirdPartySigner = await sdk.createSchnorrSigner(randomBytes(32)); // This can be anything as well. It is required data to recover an account
   const recoveryPayloads = await sdk.generateAccountRecoveryData(
     alias,
@@ -294,7 +294,7 @@ async function main() {
   await setupSdk();
   await createKeysAndInitUsers();
   // await createNewUser();
-  await depositAssets(false); // set to true if depositing ETH
+  // await depositAssets(false); // set to true if depositing ETH
   // await transferAssets();
   // await withdrawAssets();
   // await defiInteraction();
