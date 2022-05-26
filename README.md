@@ -2,6 +2,8 @@
 
 SDK setup and examples are in `./src/index.ts`. Configured to work with Aztec on the Goerli testnet.
 
+**!!! The web-app dir is under construction and does not work!!!**
+
 ## Requirements
 
 1. Node
