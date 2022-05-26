@@ -61,10 +61,8 @@ let sdk: AztecSdk,
   publicKey: GrumpkinAddress,
   user0: AztecSdkUser,
   user1: AztecSdkUser,
-  user2: AztecSdkUser,
   signer: SchnorrSigner,
-  signer1: SchnorrSigner,
-  signer2: SchnorrSigner;
+  signer1: SchnorrSigner
 
 const setupSdk = async () => {
   sdk = await createAztecSdk(walletProvider, {
