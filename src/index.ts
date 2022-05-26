@@ -142,9 +142,8 @@ const createNewUser = async () => {
     // process.env.ACCOUNT_2_MESSAGE
     `Sign this message to generate your Aztec Spending Key. This key lets the application spend your funds on Aztec.\n\nIMPORTANT: Only sign this message if you trust the application.`
   );
-  user2 = await sdk.addUser(privateKey, 2);
   const newSigner = await sdk.createSchnorrSigner(signerKey); // this can be anything. i am creating it deterministically from my ETH private key with a custom message, similar to how zk.money does it.
-  const alias = "joshc1"; // this is whatever you want
+  const alias = "tester1"; // this is whatever you want
   const thirdPartySigner = await sdk.createSchnorrSigner(randomBytes(32)); // This can be anything as well. It is required data to recover an account
   const recoveryPayloads = await sdk.generateAccountRecoveryData(
     alias,
@@ -173,15 +172,15 @@ const createNewUser = async () => {
   );
 
   console.log(
-    "new user ETH balance",
+    "user1 ETH balance",
     sdk.fromBaseUnits(
-      await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user2.id)
+      await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user1.id)
     )
   );
   console.log(
-    "new user DAI balance",
+    "user1 DAI balance",
     sdk.fromBaseUnits(
-      await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user2.id)
+      await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user1.id)
     )
   );
 };
