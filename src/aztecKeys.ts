@@ -1,4 +1,5 @@
-import { AztecSdk, WalletProvider, Web3Signer } from "@aztec/sdk";
+import { AztecSdk, EthereumProvider, WalletProvider, Web3Signer } from "@aztec/sdk";
+import { Web3Provider } from "@ethersproject/providers";
 
 const privateKeyMessage = Buffer.from(
   `Sign this message to generate your Aztec Privacy Key. This key lets the application decrypt your balance on Aztec.\n\nIMPORTANT: Only sign this message if you trust the application.`
@@ -9,7 +10,7 @@ const spendingKeyMessage = Buffer.from(
 );
 
 export async function createSpendingKey(
-  provider: WalletProvider,
+  provider: EthereumProvider,
   sdk: AztecSdk
 ) {
   const privateKey = await createSigningKey(provider, spendingKeyMessage);
@@ -18,7 +19,7 @@ export async function createSpendingKey(
 }
 
 export async function createPrivacyKey(
-  provider: WalletProvider,
+  provider: EthereumProvider,
   sdk: AztecSdk
 ) {
   const privateKey = await createSigningKey(provider, privateKeyMessage);
@@ -27,7 +28,7 @@ export async function createPrivacyKey(
 }
 
 export async function createArbitraryDeterministicKey(
-  provider: WalletProvider,
+  provider: EthereumProvider,
   sdk: AztecSdk,
   message: string
 ) {
@@ -37,9 +38,9 @@ export async function createArbitraryDeterministicKey(
   return { privateKey, publicKey };
 }
 
-const createSigningKey = async (provider: WalletProvider, message: Buffer) => {
+const createSigningKey = async (provider: EthereumProvider, message: Buffer) => {
   const signer = new Web3Signer(provider);
-  const ethAddress = provider.getAccount(0);
+  const ethAddress = (await provider.request({ method: "eth_accounts"}))[0];
   const signedMessage = await signer.signMessage(message, ethAddress);
   return signedMessage.slice(0, 32);
 };
