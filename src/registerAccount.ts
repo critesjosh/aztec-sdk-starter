@@ -2,6 +2,7 @@ import {
   AccountId,
   AztecSdk,
   EthAddress,
+  GrumpkinAddress,
   SchnorrSigner,
   TxSettlementTime,
 } from "@aztec/sdk";
@@ -11,7 +12,7 @@ export async function registerAccount(
   signer: SchnorrSigner,
   alias: string,
   newSigner: SchnorrSigner,
-  recoveryPublicKey,
+  recoveryPublicKey: GrumpkinAddress,
   tokenAddress: EthAddress,
   tokenQuantity: bigint,
   settlementTime: TxSettlementTime,
@@ -19,8 +20,8 @@ export async function registerAccount(
   sdk: AztecSdk
 ) {
   const assetId = sdk.getAssetIdByAddress(tokenAddress);
-  const tokenAssetValue = { assetId, value: tokenQuantity };
-  const txFee = (await sdk.getRegisterFees(tokenAssetValue))[settlementTime];
+  const deposit = { assetId, value: tokenQuantity };
+  const txFee = (await sdk.getRegisterFees(deposit))[settlementTime];
 
   const controller = await sdk.createRegisterController(
     user,
@@ -28,7 +29,7 @@ export async function registerAccount(
     alias,
     newSigner.getPublicKey(),
     recoveryPublicKey,
-    tokenAssetValue,
+    deposit,
     txFee,
     depositer
   );
