@@ -40,4 +40,5 @@ export async function registerAccount(
   await controller.createProof();
   await controller.sign();
   await controller.send();
+  return controller;
 }
