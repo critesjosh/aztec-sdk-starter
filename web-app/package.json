@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "copy-wasm": "cp ./node_modules/@aztec/barretenberg/wasm/barretenberg.wasm ./public/ && cp ./node_modules/@aztec/barretenberg/worker.js ./public/"
   },
   "dependencies": {
     "ethers": "^5.6.8",
