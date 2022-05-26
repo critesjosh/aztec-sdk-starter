@@ -1,6 +1,23 @@
-# Work in progress, does not work
+# Aztec demo web app
 
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+
+This only works on the Goerli testnet.
+
+It allows a user to connect to Metamask and initializes the Aztec SDK to the Goerli testnet. It includes buttons to:
+
+- Connect to Metamask
+- login (sign a message to create your Aztec privacy key from your Metamask account)
+- log the current SDK object
+- Initialize the users Aztec accounts and log the balances
+  - Account with nonce 0 is the privacy account and is not typically used to deposit or transfer funds. It is used for registering account with nonce 1 and decrypting notes.
+  - Account with nonce 1 is the spending account. The signing key associated with this account is used to spend notes. It must be registered with account 0 before it can be used.
+- Create the singer for account with nonce 1
+- Deposit Eth to account 1 from the connected Metamask account.
+
+The SDK functions are copied from `../src`. You can reference the files in that directory to see how to implement additional functionality.
+
+It is required that you serve the `barretenberg.wasm` file from the server for the SDK to work.
 
 ## Getting Started
 
@@ -15,10 +32,6 @@ yarn dev
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
 You can start editing the page by modifying `pages/index.tsx`. The page auto-updates as you edit the file.
-
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.ts`.
-
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
 
 ## Learn More
 
