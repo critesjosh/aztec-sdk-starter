@@ -40,6 +40,10 @@ The `./src/index.ts` file contains a script that shows how to do many common ope
 
 Defi interactions will not work on the Goerli testnet as the bridge contracts have not been deployed there. There is still an example of how to set up a defi interaction which will work on mainnet when Aztec Connect is launched.
 
+### Demo web app
+
+See `./web-app` for an example Next.js application.
+
 ## Building Intuition for Aztec Accounts
 
 Accounts in Aztec work differently than accounts in Ethereum. There are two main parts to each Aztec account, the privacy account associated with nonce 0 and the spending account associated with nonce 1. Both of these accounts have the same public key and are differentiated by the nonce.
