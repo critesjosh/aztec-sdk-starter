@@ -47,9 +47,7 @@ const ETHEREUM_ADDRESS_1 = EthAddress.fromString(
   )
 );
 
-const DAI_ADDRESS = EthAddress.fromString(
-  process.env.DAI_ADDRESS
-);
+const DAI_ADDRESS = EthAddress.fromString(process.env.DAI_ADDRESS);
 const ETH_TOKEN_ADDRESS = EthAddress.ZERO;
 
 const ethersProvider = new JsonRpcProvider(process.env.ETHEREUM_HOST);
@@ -63,7 +61,7 @@ let sdk: AztecSdk,
   user0: AztecSdkUser,
   user1: AztecSdkUser,
   signer: SchnorrSigner,
-  signer1: SchnorrSigner
+  signer1: SchnorrSigner;
 
 const setupSdk = async () => {
   sdk = await createAztecSdk(walletProvider, {
@@ -83,11 +81,10 @@ const createKeysAndInitUsers = async () => {
   privateKey = keys.privateKey;
   publicKey = keys.publicKey;
 
-/*
+  /*
   Setup the first Aztec account from the generated privacy key
 */
 
-  // You can generate many Aztec AccountIds from the same private key
   user0 = await sdk.addUser(privateKey, 0);
   const { privateKey: signingPrivateKey } = await createSpendingKey(
     walletProvider,
@@ -102,17 +99,11 @@ const createKeysAndInitUsers = async () => {
       await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user0.id)
     )
   );
-  // console.log(
-  //   "user0 DAI balance",
-  //   sdk.fromBaseUnits(
-  //     await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user0.id)
-  //   )
-  // );
 
   /*
-  Setup the second Aztec account
-  This account has already been registered on zk.money
-*/
+    Setup the second Aztec account
+    This is the account you see when logged in to zk.money
+  */
 
   user1 = await sdk.addUser(privateKey, 1);
   signer1 = await sdk.createSchnorrSigner(signingPrivateKey);
@@ -123,12 +114,7 @@ const createKeysAndInitUsers = async () => {
       await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user1.id)
     )
   );
-  // console.log(
-  //   "user1 DAI balance",
-  //   sdk.fromBaseUnits(
-  //     await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user1.id)
-  //   )
-  // );
+
 };
 
 const createNewUser = async () => {
@@ -148,7 +134,6 @@ const createNewUser = async () => {
     alias,
     publicKey,
     [
-      // this public key is the public key associated with all of these accounts (user0, user1, user2, etc)
       thirdPartySigner.getPublicKey(),
     ]
   );
@@ -174,12 +159,6 @@ const createNewUser = async () => {
     "user1 ETH balance",
     sdk.fromBaseUnits(
       await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user1.id)
-    )
-  );
-  console.log(
-    "user1 DAI balance",
-    sdk.fromBaseUnits(
-      await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user1.id)
     )
   );
 };
@@ -280,13 +259,9 @@ const getDefiTxs = async () => {
   console.log(txs);
 };
 
-const recover = async ()=>{
+const recover = async () => {};
 
-}
-
-const migrate = async()=>{
-
-}
+const migrate = async () => {};
 
 async function main() {
   await setupSdk();
