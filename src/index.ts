@@ -12,6 +12,7 @@ import {
   SchnorrSigner,
   TxSettlementTime,
   WalletProvider,
+  SdkFlavour,
 } from "@aztec/sdk";
 import { JsonRpcProvider } from "@ethersproject/providers";
 import { registerAccount } from "./registerAccount";
@@ -69,11 +70,11 @@ const setupSdk = async () => {
     serverUrl: process.env.ROLLUP_HOST,
     pollInterval: 1000,
     memoryDb: true,
+    flavour: SdkFlavour.PLAIN,
     minConfirmation: 1, // ETH block confirmations
   });
 
   await sdk.run();
-  await sdk.awaitSynchronised();
 };
 
 const createKeysAndInitUsers = async () => {
@@ -101,12 +102,12 @@ const createKeysAndInitUsers = async () => {
       await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user0.id)
     )
   );
-  console.log(
-    "user0 DAI balance",
-    sdk.fromBaseUnits(
-      await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user0.id)
-    )
-  );
+  // console.log(
+  //   "user0 DAI balance",
+  //   sdk.fromBaseUnits(
+  //     await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user0.id)
+  //   )
+  // );
 
   /*
   Setup the second Aztec account
@@ -122,12 +123,12 @@ const createKeysAndInitUsers = async () => {
       await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user1.id)
     )
   );
-  console.log(
-    "user1 DAI balance",
-    sdk.fromBaseUnits(
-      await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user1.id)
-    )
-  );
+  // console.log(
+  //   "user1 DAI balance",
+  //   sdk.fromBaseUnits(
+  //     await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user1.id)
+  //   )
+  // );
 };
 
 const createNewUser = async () => {
@@ -185,7 +186,7 @@ const createNewUser = async () => {
 
 const depositAssets = async (isEth: boolean = true) => {
   const depositTokenQuantity: bigint = ethers.utils
-    .parseEther("1.11")
+    .parseEther("0.01")
     .toBigInt();
 
   // use TxSettlementTime.NEXT_ROLLUP for a cheaper, slower option than TxSettlementTime.INSTANT
@@ -291,7 +292,7 @@ async function main() {
   await setupSdk();
   await createKeysAndInitUsers();
   // await createNewUser();
-  // await depositAssets(false); // set to true if depositing ETH
+  await depositAssets(true); // set to true if depositing ETH
   // await transferAssets();
   // await withdrawAssets();
   // await defiInteraction();
