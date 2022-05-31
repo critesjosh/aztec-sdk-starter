@@ -68,6 +68,7 @@ const Home: NextPage = () => {
 
         const sdk = await createAztecSdk(ethereumProvider, {
           serverUrl: "https://api.aztec.network/aztec-connect-testnet/falafel", // goerli testnet
+          // serverUrl: "https://aztec-connect-testnet-sdk.aztec.network",
           pollInterval: 1000,
           memoryDb: true,
           debug: "bb:*",
@@ -76,7 +77,6 @@ const Home: NextPage = () => {
         });
 
         await sdk.run();
-        await sdk.awaitSynchronised();
 
         console.log("Aztec SDK initialized", sdk);
         setIsConnected(true);
@@ -112,21 +112,12 @@ const Home: NextPage = () => {
       : await sdk!.addUser(privacyKey!, 0);
 
     setUser0(user0!);
-    await sdk!.awaitSynchronised();
+    await user0.awaitSynchronised();
     // Wait for the SDK to read & decrypt notes to get the latest balances
     console.log(
       "account 0 ETH balance",
       sdk!.fromBaseUnits(
         await sdk!.getBalanceAv(sdk!.getAssetIdBySymbol("ETH"), accountId)
-      )
-    );
-    console.log(
-      "account 0 DAI balance",
-      sdk!.fromBaseUnits(
-        await sdk!.getBalanceAv(
-          sdk!.getAssetIdByAddress(DAI_ADDRESS),
-          accountId
-        )
       )
     );
 
@@ -139,17 +130,11 @@ const Home: NextPage = () => {
       setUserExists(true);
 
     setUser1(user1);
-    await sdk?.awaitSynchronised();
+    await user1.awaitSynchronised();
     console.log(
       "account 1 ETH balance",
       sdk?.fromBaseUnits(
         await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user1.id)
-      )
-    );
-    console.log(
-      "account 1 DAI balance",
-      sdk?.fromBaseUnits(
-        await sdk.getBalanceAv(sdk.getAssetIdByAddress(DAI_ADDRESS), user1.id)
       )
     );
   }
