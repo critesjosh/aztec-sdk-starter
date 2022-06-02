@@ -28,9 +28,11 @@ yarn go
 
 The script currently runs on a version of Aztec connected to the Goerli testnet.
 
-You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-testnet/falafel/status
+You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-testnet/falafel/status and check the testnet block explorer here: https://aztec-connect-testnet-explorer.aztec.network/
 
-You can mint mock DAI on goerli by interacting with this contract `0x86166410b7a1a6d8b9df3660a978ea79aa1f30fd`. This encoded function call will mint you 10,000 mock DAI. `0x40c10f19000000000000000000000000302ce2faf4e3c75e8483456552dceab11205c3d600000000000000000000000000000000000000000000021e19e0c9bab2400000` just replace `302ce2faf4e3c75e8483456552dceab11205c3d6` with your Ethereum address. [Here](https://goerli.etherscan.io/tx/0x13201e94ed14db1584b1cbc6f98eea1be903fda24c110cd9d1603e667d3293bb) is an example tx.
+**This DAI isnt currently working on goerli**
+
+~~You can mint mock DAI on goerli by interacting with this contract `0x86166410b7a1a6d8b9df3660a978ea79aa1f30fd`. This encoded function call will mint you 10,000 mock DAI. `0x40c10f19000000000000000000000000302ce2faf4e3c75e8483456552dceab11205c3d600000000000000000000000000000000000000000000021e19e0c9bab2400000` just replace `302ce2faf4e3c75e8483456552dceab11205c3d6` with your Ethereum address. [Here](https://goerli.etherscan.io/tx/0x13201e94ed14db1584b1cbc6f98eea1be903fda24c110cd9d1603e667d3293bb) is an example tx.~~
 
 ## Contents
 
