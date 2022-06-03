@@ -35,8 +35,8 @@ const Home: NextPage = () => {
     useState<null | EthereumProvider>(null);
   const [ethAccount, setEthAccount] = useState<string | null>(null);
   const [sdk, setSdk] = useState<null | AztecSdk>(null);
-  const [user0, setUser0] = useState<AztecSdkUser | null>(null);
-  const [user1, setUser1] = useState<AztecSdkUser | null>(null);
+  const [account0, setAccount0] = useState<AztecSdkUser | null>(null);
+  const [account1, setAccount1] = useState<AztecSdkUser | null>(null);
   const [userExists, setUserExists] = useState<boolean>(false);
   const [privacyKey, setPrivacyKey] = useState<Buffer | null>(null);
   const [publicKey, setPublicKey] = useState<GrumpkinAddress | null>(null);
@@ -107,12 +107,12 @@ const Home: NextPage = () => {
 
   async function initUsersAndPrintBalances() {
     const accountId = new AccountId(publicKey!, 0);
-    let user0 = (await sdk!.userExists(accountId))
+    let account0 = (await sdk!.userExists(accountId))
       ? await sdk!.getUser(accountId)
       : await sdk!.addUser(privacyKey!, 0);
 
-    setUser0(user0!);
-    await user0.awaitSynchronised();
+    setAccount0(account0!);
+    await account0.awaitSynchronised();
     // Wait for the SDK to read & decrypt notes to get the latest balances
     console.log(
       "account 0 ETH balance",
@@ -122,19 +122,19 @@ const Home: NextPage = () => {
     );
 
     const accountId1 = new AccountId(publicKey!, 1);
-    let user1 = (await sdk!.userExists(accountId1))
+    let account1 = (await sdk!.userExists(accountId1))
       ? await sdk!.getUser(accountId1)
       : await sdk!.addUser(privacyKey!, 1);
 
-    if ((await user1.getUserData()).aliasHash !== undefined)
+    if ((await account1.getUserData()).aliasHash !== undefined)
       setUserExists(true);
 
-    setUser1(user1);
-    await user1.awaitSynchronised();
+    setAccount1(account1);
+    await account1.awaitSynchronised();
     console.log(
       "account 1 ETH balance",
       sdk?.fromBaseUnits(
-        await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user1.id)
+        await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), account1.id)
       )
     );
   }
@@ -154,7 +154,7 @@ const Home: NextPage = () => {
     const recoverySigner = await sdk!.createSchnorrSigner(randomBytes(32));
     let recoverPublicKey = recoverySigner.getPublicKey();
     let controller = await registerAccount(
-      user0!.id,
+      account0!.id,
       signer0!,
       alias,
       signer1!,
@@ -181,7 +181,7 @@ const Home: NextPage = () => {
 
     let controller = await depositEthToAztec(
       EthAddress.fromString(ethAccount!),
-      user1!.id,
+      account1!.id,
       depositTokenQuantity,
       TxSettlementTime.NEXT_ROLLUP,
       sdk!,
@@ -225,14 +225,14 @@ const Home: NextPage = () => {
           ) : (
             ""
           )}
-          {!signer1 && user1 ? (
+          {!signer1 && account1 ? (
             <button onClick={() => getSpendingKey()}>
               Create Aztec Signer (for account 1)
             </button>
           ) : (
             ""
           )}
-          {signer1 && user1 ? (
+          {signer1 && account1 ? (
             <button onClick={() => depositEth()}>deposit .01 eth</button>
           ) : (
             ""
