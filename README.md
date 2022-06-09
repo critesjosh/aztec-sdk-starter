@@ -18,7 +18,7 @@ yarn
 
 2. Create your `.env` file and add your Ethereum private key with Goerli ETH.
 
-3. Run script, `./src/index.ts`:
+3. Run script, `./src/sdk_2.1.5/index.ts`:
 
 ```shell
 yarn go
@@ -36,42 +36,25 @@ You can check the status of the Aztec rollup provider at this url. https://api.a
 
 ## Contents
 
-The `./src/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transfering and withdrawing assets (Eth and tokens) and doing interactions with Ethereum L1 defi applications (like Lido and Element).
+The `./src/sdk_2.1.5/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transfering and withdrawing assets (Eth and tokens). Examples of interactions with Ethereum L1 defi applications (like Lido and Element) are coming soon. Defi interactions will not work on the Goerli testnet as the bridge contracts have not been deployed there.
 
-Defi interactions will not work on the Goerli testnet as the bridge contracts have not been deployed there. There is still an example of how to set up a defi interaction which will work on mainnet when Aztec Connect is launched.
+### Demo web app (WIP)
 
-### Demo web app
-
-See `./web-app` for an example Next.js application.
+See `./web-app` for an example Next.js application. This is using an older version of the SDK and needs to be updated.
 
 ## Building Intuition for Aztec Accounts
 
-Accounts in Aztec work differently than accounts in Ethereum. There are two main parts to each Aztec account, the privacy account associated with nonce 0 and the spending account associated with nonce 1. Both of these accounts have the same public key and are differentiated by the nonce.
+Accounts in Aztec work differently than accounts in Ethereum. There are two main parts to each Aztec account, an account and the associated signer (spending key). The private keys for each can be different, but don't have to be. The private key associated with the account is used to decrypt asset notes and used to register a distinct spending key. It is a best practice to register a new signer when an account is created to create separation between the decryption key and the spending key.
 
 In [zk.money](https://zk.money), Aztec accounts are generated using Ethereum accounts by having the user sign a message and deriving the Aztec keys the signed message (see `src/aztecKeys.ts`). Different messages are used to generate different keys.
 
-### Privacy Account
+### Signer (spending key)
 
-The privacy account is the account that is first generated using:
+If the spending key is lost, a recovery flow can be initiated by the recovery account specified when the spending account was registered.
 
-```ts
-createPrivacyKey(provider: WalletProvider, sdk: AztecSdk): Promise<{
-    privateKey: Buffer;
-    publicKey: GrumpkinAddress;
-}>
-```
+The account signer is registered with a human-readable alias. The alias can be anything as long as it hasn't been claimed yet.
 
-The private key that is returned can be used to decrypt notes for both the privacy account (nonce 0) and the spending account (nonce 1). The private key is used to spend notes associated with the privacy account and register a spending account. Typically the privacy account does not handle funds, it is used to create a spending account and decrypt notes. This reduces the risks of sharing the privacy key.
-
-### Spending Account
-
-Spending accounts are registered with a human-readable alias, a new spending key and a recovery key (see `src/registerAccount.ts`).
-
-The spending account is typically the account where users will accept and send notes (this is how it is done in zk.money). The spending account has the same public key as the privacy account but is differentiated by the nonce. Notes associated with the spending account can be spent by the spending key defined during registration. If the spending key is lost, a recovery flow can be initiated by the recovery account specified when the spending account was registered.
-
-The spending account is associated with a human-readable alias. The alias can be anything as long as it hasn't been claimed yet.
-
-Registering an account has an associated fee as it includes a token deposit and is posting transactions to the network.
+Registering an account has an associated fee as it includes a token (or ETH) deposit and is posting transactions to the network.
 
 ## Debug
 
@@ -80,3 +63,5 @@ Run in terminal
 ```shell
 export DEBUG=bb:*
 ```
+
+When debugging in the browser, make sure the dev tools console logging is set to verbose.
