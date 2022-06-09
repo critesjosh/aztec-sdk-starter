@@ -65,3 +65,7 @@ export DEBUG=bb:*
 ```
 
 When debugging in the browser, make sure the dev tools console logging is set to verbose.
+
+Debugging applications in privacy preserving systems like Aztec is difficult--you can't reference the block explorer to verify all transaction and account information. I like to use the [testnet version of zk.money](https://aztec-connect-testnet.zk.money/) to cross reference account and transaction information.
+
+We are in the process of building out better developer tooling in this regard (ie import your privacy key into the block explorer to decrypt your account and transaction histories). If you would like to help build developer tooling for Aztec, reach out to me on twitter [@critesjosh_](https://twitter.com/critesjosh_).
