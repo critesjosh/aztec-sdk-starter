@@ -3,6 +3,7 @@ import {
     AztecSdk,
     EthAddress,
     GrumpkinAddress,
+    TxId,
     TxSettlementTime,
   } from "@aztec/sdk";
   
@@ -12,7 +13,7 @@ import {
     tokenQuantity: bigint,
     settlementTime: TxSettlementTime,
     sdk: AztecSdk,
-  ) {
+  ) : Promise<TxId> {
     const tokenAssetId = sdk.getAssetIdBySymbol('ETH');
     const tokenDepositFee = (await sdk.getDepositFees(tokenAssetId))[
       settlementTime
@@ -33,8 +34,8 @@ import {
     // TODO: check if there is a pending deposit, if so skip to send()
     await tokenDepositController.depositFundsToContract(); // for ETH, returns txHash
     await tokenDepositController.awaitDepositFundsToContract();
-    await tokenDepositController.send();
-    return tokenDepositController;
+    let txId = await tokenDepositController.send();
+    return txId;
   }
   
 //   export async function depositTokensToAztec(
