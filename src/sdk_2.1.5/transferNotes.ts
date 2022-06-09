@@ -1,5 +1,5 @@
 // // https://github.com/AztecProtocol/aztec2-internal/blob/defi-bridge-project/end-to-end/src/sdk_utils.ts
-import { AccountId, AztecSdk, EthAddress, GrumpkinAddress, SchnorrSigner, TxSettlementTime } from "@aztec/sdk";
+import { AccountId, AztecSdk, EthAddress, GrumpkinAddress, SchnorrSigner, TxId, TxSettlementTime } from "@aztec/sdk";
 
 export async function sendAsset(
   sender: GrumpkinAddress,
@@ -9,7 +9,7 @@ export async function sendAsset(
   settlementTime: TxSettlementTime,
   sdk: AztecSdk,
   signer: SchnorrSigner
-) {
+) : Promise<TxId> {
   const assetId = sdk.getAssetIdByAddress(tokenAddress);
   const tokenTransferFee = (await sdk.getTransferFees(assetId))[
     settlementTime
@@ -24,6 +24,6 @@ export async function sendAsset(
     recipient
   );
   await tokenTransferController.createProof();
-  await tokenTransferController.send();
-  return tokenTransferController;
+  let txId = await tokenTransferController.send();
+  return txId;
 }
