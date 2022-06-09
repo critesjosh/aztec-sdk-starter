@@ -1,7 +1,6 @@
 import {
     EthAddress,
     AztecSdk,
-    AccountId,
     SchnorrSigner,
     GrumpkinAddress,
     TxId,

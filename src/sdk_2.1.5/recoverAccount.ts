@@ -4,7 +4,6 @@ import {
   AztecSdk,
   TxId,
   TxSettlementTime,
-  AssetValue,
 } from "@aztec/sdk";
 
 export async function recover(

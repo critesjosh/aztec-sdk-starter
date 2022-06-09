@@ -1,11 +1,8 @@
 import {
-  AccountId,
-  assetValueFromJson,
-  AssetValue,
   AztecSdk,
   EthAddress,
   GrumpkinAddress,
-  SchnorrSigner,
+  TxId,
   TxSettlementTime,
 } from "@aztec/sdk";
 
@@ -20,7 +17,7 @@ export async function registerAccount(
   settlementTime: TxSettlementTime,
   depositor: EthAddress,
   sdk: AztecSdk
-) {
+) : Promise<TxId> {
   const assetId = sdk.getAssetIdByAddress(tokenAddress);
   const deposit = { assetId, value: tokenQuantity };
   const txFee = (await sdk.getRegisterFees(deposit))[settlementTime];
@@ -42,6 +39,6 @@ export async function registerAccount(
 
   await controller.createProof();
   await controller.sign();
-  await controller.send();
-  return controller;
+  let txId = await controller.send();
+  return txId;
 }

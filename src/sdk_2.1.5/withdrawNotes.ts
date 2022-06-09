@@ -1,6 +1,13 @@
 // // https://github.com/AztecProtocol/aztec2-internal/blob/defi-bridge-project/end-to-end/src/sdk_utils.ts
 
-import { AccountId, AztecSdk, EthAddress, GrumpkinAddress, SchnorrSigner, TxId, TxSettlementTime } from "@aztec/sdk";
+import {
+  AztecSdk,
+  EthAddress,
+  GrumpkinAddress,
+  SchnorrSigner,
+  TxId,
+  TxSettlementTime,
+} from "@aztec/sdk";
 
 export async function withdrawTokens(
   user: GrumpkinAddress,
@@ -10,7 +17,7 @@ export async function withdrawTokens(
   settlementTime: TxSettlementTime,
   sdk: AztecSdk,
   signer: SchnorrSigner
-) : Promise<TxId> {
+): Promise<TxId> {
   const tokenAssetId = sdk.getAssetIdByAddress(token);
   const tokenWithdrawFee = (await sdk.getWithdrawFees(tokenAssetId))[
     settlementTime
