@@ -16,9 +16,11 @@ SDK setup and examples are in `./src/index.ts`. Configured to work with Aztec on
 yarn
 ```
 
-2. Create your `.env` file and add your Ethereum private key with Goerli ETH.
+When you asked for which version of `aztec/bridge-clients` to use, pick the highest version number.
 
-3. Run script, `./src/sdk_2.1.5/index.ts`:
+1. Create your `.env` file and add your Ethereum private key with Goerli ETH.
+
+2. Run script, `./src/sdk_2.1.5/index.ts`:
 
 ```shell
 yarn go
@@ -38,9 +40,9 @@ You can check the status of the Aztec rollup provider at this url. https://api.a
 
 The `./src/sdk_2.1.5/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transfering and withdrawing assets (Eth and tokens). Examples of interactions with Ethereum L1 defi applications (like Lido and Element) are coming soon. Defi interactions will not work on the Goerli testnet as the bridge contracts have not been deployed there.
 
-### Demo web app (WIP)
+### Demo web app
 
-See `./web-app` for an example Next.js application. This is using an older version of the SDK and needs to be updated.
+See `./web-app` for an example Next.js application.
 
 ## Building Intuition for Aztec Accounts
 
