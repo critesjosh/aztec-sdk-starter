@@ -19,9 +19,6 @@ import {
 import { randomBytes } from "crypto";
 
 import {
-  createPrivacyKey,
-  createSpendingKey,
-  DAI_ADDRESS,
   depositEthToAztec,
   registerAccount,
 } from "./utils";
@@ -33,15 +30,14 @@ const Home: NextPage = () => {
   const [signer, setSigner] = useState<null | JsonRpcSigner>(null);
   const [ethereumProvider, setEthereumProvider] =
     useState<null | EthereumProvider>(null);
-  const [ethAccount, setEthAccount] = useState<string | null>(null);
+  const [ethAccount, setEthAccount] = useState<EthAddress | null>(null);
   const [sdk, setSdk] = useState<null | AztecSdk>(null);
   const [account0, setAccount0] = useState<AztecSdkUser | null>(null);
   const [account1, setAccount1] = useState<AztecSdkUser | null>(null);
   const [userExists, setUserExists] = useState<boolean>(false);
-  const [privacyKey, setPrivacyKey] = useState<Buffer | null>(null);
-  const [publicKey, setPublicKey] = useState<GrumpkinAddress | null>(null);
-  const [signer1, setSigner1] = useState<SchnorrSigner | undefined>(undefined);
-  const [signer0, setSigner0] = useState<SchnorrSigner | undefined>(undefined);
+  const [accountPrivateKey, setAccountPrivateKey] = useState<Buffer | null>(null);
+  const [accountPublicKey, setAccountPublicKey] = useState<GrumpkinAddress | null>(null);
+  const [spendingSigner, setSpendingSigner] = useState<SchnorrSigner | undefined>(undefined);
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -57,7 +53,8 @@ const Home: NextPage = () => {
         let accounts = await ethereum.request({
           method: "eth_requestAccounts",
         });
-        setEthAccount(accounts[0]);
+        setEthAccount(EthAddress.fromString(accounts[0]));
+        
 
         const ethersProvider: Web3Provider = new ethers.providers.Web3Provider(
           window.ethereum
@@ -67,12 +64,10 @@ const Home: NextPage = () => {
         );
 
         const sdk = await createAztecSdk(ethereumProvider, {
-          serverUrl: "https://api.aztec.network/aztec-connect-testnet/falafel", // goerli testnet
-          // serverUrl: "https://aztec-connect-testnet-sdk.aztec.network",
+          serverUrl: "https://aztec-connect-testnet-sdk.aztec.network", // goerli testnet
           pollInterval: 1000,
           memoryDb: true,
           debug: "bb:*",
-          flavour: SdkFlavour.PLAIN,
           minConfirmation: 1, // ETH block confirmations
         });
 
@@ -93,57 +88,40 @@ const Home: NextPage = () => {
   }
 
   async function login() {
-    const { privateKey, publicKey: pubkey } = await createPrivacyKey(
-      ethereumProvider!,
-      sdk!
-    );
+    const { publicKey: pubkey, privateKey } = await sdk!.generateAccountKeyPair(ethAccount!)
     console.log("privacy key", privateKey);
-    console.log("public key", pubkey);
-    const signer = await sdk!.createSchnorrSigner(privateKey);
-    setSigner0(signer);
-    setPrivacyKey(privateKey);
-    setPublicKey(pubkey);
+    console.log("public key", pubkey.toString());
+
+    setAccountPrivateKey(privateKey);
+    setAccountPublicKey(pubkey);
   }
 
   async function initUsersAndPrintBalances() {
-    const accountId = new AccountId(publicKey!, 0);
-    let account0 = (await sdk!.userExists(accountId))
-      ? await sdk!.getUser(accountId)
-      : await sdk!.addUser(privacyKey!, 0);
+
+    let account0 = (await sdk!.userExists(accountPublicKey!))
+      ? await sdk!.getUser(accountPublicKey!)
+      : await sdk!.addUser(accountPrivateKey!);
 
     setAccount0(account0!);
+
+    if((await sdk?.isAccountRegistered(accountPublicKey!)))
+      setUserExists(true);
+
     await account0.awaitSynchronised();
     // Wait for the SDK to read & decrypt notes to get the latest balances
     console.log(
-      "account 0 ETH balance",
+      "zkETH balance",
       sdk!.fromBaseUnits(
-        await sdk!.getBalanceAv(sdk!.getAssetIdBySymbol("ETH"), accountId)
-      )
-    );
-
-    const accountId1 = new AccountId(publicKey!, 1);
-    let account1 = (await sdk!.userExists(accountId1))
-      ? await sdk!.getUser(accountId1)
-      : await sdk!.addUser(privacyKey!, 1);
-
-    if ((await account1.getUserData()).aliasHash !== undefined)
-      setUserExists(true);
-
-    setAccount1(account1);
-    await account1.awaitSynchronised();
-    console.log(
-      "account 1 ETH balance",
-      sdk?.fromBaseUnits(
-        await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), account1.id)
+        await sdk!.getBalance(account0.id, sdk!.getAssetIdBySymbol("ETH"))
       )
     );
   }
 
   async function getSpendingKey() {
-    const { privateKey } = await createSpendingKey(ethereumProvider!, sdk!);
+    const { privateKey } = await sdk!.generateSpendingKeyPair(ethAccount!);
     const signer = await sdk?.createSchnorrSigner(privateKey);
-    console.log("signer1 added", signer);
-    setSigner1(signer);
+    console.log("signer added", signer);
+    setSpendingSigner(signer);
   }
 
   async function registerNewAccount() {
@@ -153,24 +131,22 @@ const Home: NextPage = () => {
       .toBigInt();
     const recoverySigner = await sdk!.createSchnorrSigner(randomBytes(32));
     let recoverPublicKey = recoverySigner.getPublicKey();
-    let controller = await registerAccount(
-      account0!.id,
-      signer0!,
+    let txId = await registerAccount(
+      accountPublicKey!,
       alias,
-      signer1!,
+      accountPrivateKey!,
+      spendingSigner!.getPublicKey(),
       recoverPublicKey,
       EthAddress.ZERO,
       depositTokenQuantity,
       TxSettlementTime.NEXT_ROLLUP,
-      EthAddress.fromString(ethAccount!),
+      ethAccount!,
       sdk!
     );
-    console.log("registration controller", controller);
+    console.log("registration txId", txId);
     console.log(
       "lookup tx on explorer",
-      `https://aztec-connect-testnet-explorer.aztec.network/goerli/tx/${controller
-        .getTxId()
-        ?.toString()}`
+      `https://aztec-connect-testnet-explorer.aztec.network/goerli/tx/${txId.toString()}`
     );
   }
 
@@ -179,21 +155,18 @@ const Home: NextPage = () => {
       .parseEther("0.01")
       .toBigInt();
 
-    let controller = await depositEthToAztec(
-      EthAddress.fromString(ethAccount!),
-      account1!.id,
+    let txId = await depositEthToAztec(
+      ethAccount!,
+      accountPublicKey!,
       depositTokenQuantity,
       TxSettlementTime.NEXT_ROLLUP,
       sdk!,
-      signer1!
     );
 
-    console.log("deposit tx controller", controller);
+    console.log("deposit txId", txId);
     console.log(
       "lookup tx on explorer",
-      `https://aztec-connect-testnet-explorer.aztec.network/goerli/tx/${controller
-        .getTxId()
-        .toString()}`
+      `https://aztec-connect-testnet-explorer.aztec.network/goerli/tx/${txId.toString()}`
     );
   }
 
@@ -211,28 +184,28 @@ const Home: NextPage = () => {
       {connecting ? "Please wait, setting up Aztec" : ""}
       {sdk ? (
         <div>
-          {privacyKey ? (
+          {accountPrivateKey ? (
             <button onClick={() => initUsersAndPrintBalances()}>
               init users, log balances
             </button>
           ) : (
             <button onClick={() => login()}>Login</button>
           )}
-          {signer1 && !userExists ? (
+          {spendingSigner && !userExists ? (
             <button onClick={() => registerNewAccount()}>
               Register new account
             </button>
           ) : (
             ""
           )}
-          {!signer1 && account1 ? (
+          {!spendingSigner && account0 ? (
             <button onClick={() => getSpendingKey()}>
-              Create Aztec Signer (for account 1)
+              Create Spending Key (signer)
             </button>
           ) : (
             ""
           )}
-          {signer1 && account1 ? (
+          {spendingSigner && account0 ? (
             <button onClick={() => depositEth()}>deposit .01 eth</button>
           ) : (
             ""

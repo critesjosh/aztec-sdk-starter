@@ -7,8 +7,12 @@ import {
   GrumpkinAddress,
   SchnorrSigner,
   TxSettlementTime,
+  TxId,
   WalletProvider,
   Web3Signer,
+  RegisterController,
+  DepositController,
+  DefiController,
 } from "@aztec/sdk";
 import { Web3Provider } from "@ethersproject/providers";
 
@@ -64,13 +68,12 @@ const createSigningKey = async (
 };
 
 export async function depositEthToAztec(
-  usersEthereumAddress: EthAddress,
-  user: AccountId,
+  depositor: EthAddress,
+  recipient: GrumpkinAddress,
   tokenQuantity: bigint,
   settlementTime: TxSettlementTime,
-  sdk: AztecSdk,
-  signer: SchnorrSigner
-) {
+  sdk: AztecSdk
+): Promise<TxId> {
   const tokenAssetId = sdk.getAssetIdBySymbol("ETH");
   const tokenDepositFee = (await sdk.getDepositFees(tokenAssetId))[
     settlementTime
@@ -80,81 +83,49 @@ export async function depositEthToAztec(
     value: tokenQuantity,
   };
   const tokenDepositController = sdk.createDepositController(
-    user,
-    signer,
+    depositor,
     tokenAssetValue,
     tokenDepositFee,
-    usersEthereumAddress
+    recipient,
+    true
   );
   await tokenDepositController.createProof();
   await tokenDepositController.sign();
-  await tokenDepositController.depositFundsToContractWithProofApproval(); // for ETH, returns txHash
-  await tokenDepositController.awaitDepositFundsToContract();
-  await tokenDepositController.send();
-  // await tokenDepositController.awaitSettlement();
-  return tokenDepositController;
-}
-
-export async function depositTokensToAztec(
-  usersEthereumAddress: EthAddress,
-  user: AccountId,
-  token: EthAddress,
-  tokenQuantity: bigint,
-  settlementTime: TxSettlementTime,
-  sdk: AztecSdk,
-  signer: SchnorrSigner
-) {
-  const tokenAssetId = sdk.getAssetIdByAddress(token);
-  // ^ can also use sdk.getAssetIdBySymbol('DAI');
-  const tokenDepositFee = (await sdk.getDepositFees(tokenAssetId))[
-    settlementTime
-  ];
-  const tokenAssetValue: AssetValue = {
-    assetId: tokenAssetId,
-    value: tokenQuantity,
-  };
-  const tokenDepositController = sdk.createDepositController(
-    user,
-    signer,
-    tokenAssetValue,
-    tokenDepositFee,
-    usersEthereumAddress
-  );
-  await tokenDepositController.createProof();
-  await tokenDepositController.sign();
-  await tokenDepositController.approve();
-  const txHash = await tokenDepositController.depositFundsToContract();
-  await sdk.getTransactionReceipt(txHash);
-  await tokenDepositController.send();
-  // await tokenDepositController.awaitSettlement();
-  return tokenDepositController;
+  console.log((await tokenDepositController.getPendingFunds()))
+  if ((await tokenDepositController.getPendingFunds()) < tokenQuantity) {
+    await tokenDepositController.depositFundsToContract();
+    await tokenDepositController.awaitDepositFundsToContract();
+  }
+  let txId = await tokenDepositController.send();
+  return txId;
 }
 
 export async function registerAccount(
-  user: AccountId,
-  signer: SchnorrSigner,
+  userId: GrumpkinAddress,
   alias: string,
-  newSigner: SchnorrSigner,
+  accountPrivateKey: Buffer,
+  newSigner: GrumpkinAddress,
   recoveryPublicKey: GrumpkinAddress,
   tokenAddress: EthAddress,
   tokenQuantity: bigint,
   settlementTime: TxSettlementTime,
-  depositer: EthAddress,
+  depositor: EthAddress,
   sdk: AztecSdk
-) {
+): Promise<TxId> {
   const assetId = sdk.getAssetIdByAddress(tokenAddress);
   const deposit = { assetId, value: tokenQuantity };
   const txFee = (await sdk.getRegisterFees(deposit))[settlementTime];
 
   const controller = await sdk.createRegisterController(
-    user,
-    signer,
+    userId,
     alias,
-    newSigner.getPublicKey(),
+    accountPrivateKey,
+    newSigner,
     recoveryPublicKey,
     deposit,
     txFee,
-    depositer
+    depositor
+    // optional feePayer requires an Aztec Signer to pay the fee
   );
 
   await controller.depositFundsToContract();
@@ -162,6 +133,6 @@ export async function registerAccount(
 
   await controller.createProof();
   await controller.sign();
-  await controller.send();
-  return controller;
+  let txId = await controller.send();
+  return txId;
 }
