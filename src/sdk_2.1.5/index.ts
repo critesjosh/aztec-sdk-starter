@@ -135,7 +135,7 @@ async function depositAssets() {
     ethAddresses[0],
     accounts[0].privacyAccount.id,
     tokenQuantity,
-    TxSettlementTime.INSTANT,
+    TxSettlementTime.NEXT_ROLLUP,
     sdk
   );
 
@@ -144,14 +144,14 @@ async function depositAssets() {
 
 async function registerSigner() {
   registerAccount(
-    privacyAccounts[0].id,
+    accounts[0].privacyAccount.id,
     "test2",
     accounts[0].privacyAccountKeys.privateKey,
     signers[0],
     undefined,
     ETH_TOKEN_ADDRESS,
     tokenQuantity,
-    TxSettlementTime.INSTANT,
+    TxSettlementTime.NEXT_ROLLUP,
     ethAddresses[0],
     sdk
   );
