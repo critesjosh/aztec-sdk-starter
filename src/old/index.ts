@@ -68,6 +68,7 @@ const setupSdk = async () => {
     serverUrl: process.env.ROLLUP_HOST,
     pollInterval: 1000,
     memoryDb: true,
+    debug: "bb:*",
     flavour: SdkFlavour.PLAIN,
     minConfirmation: 1, // ETH block confirmations
   });
@@ -110,9 +111,10 @@ const createKeysAndInitUsers = async () => {
   await user1.awaitSynchronised();
   console.log(
     "user1 ETH balance",
-    sdk.fromBaseUnits(
-      await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user1.id)
-    )
+    //sdk.fromBaseUnits(
+      (await user1.getBalance(sdk.getAssetIdBySymbol("ETH"))) / BigInt(10**18)
+      //await sdk.getBalanceAv(sdk.getAssetIdBySymbol("ETH"), user1.id)
+    //)
   );
 
 };
@@ -267,7 +269,7 @@ async function main() {
   await setupSdk();
   await createKeysAndInitUsers();
   // await createNewUser();
-  await depositAssets(true); // set to true if depositing ETH
+  // await depositAssets(true); // set to true if depositing ETH
   // await transferAssets();
   // await withdrawAssets();
   // await defiInteraction();
