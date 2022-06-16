@@ -1,6 +1,6 @@
 # Aztec SDK Reference script
 
-SDK setup and examples are in `./src/index.ts`. Configured to work with Aztec on the Goerli testnet.
+SDK setup and examples are in `./src/latest/index.ts`. Configured to work with Aztec on the Goerli testnet.
 
 ## Requirements
 
@@ -20,7 +20,7 @@ When you asked for which version of `aztec/bridge-clients` to use, pick the high
 
 1. Create your `.env` file and add your Ethereum private key with Goerli ETH.
 
-2. Run script, `./src/sdk_2.1.5/index.ts`:
+2. Run script, `./src/latest/index.ts`:
 
 ```shell
 yarn go
