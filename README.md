@@ -38,7 +38,7 @@ You can check the status of the Aztec rollup provider at this url. https://api.a
 
 ## Contents
 
-The `./src/sdk_2.1.5/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transfering and withdrawing assets (Eth and tokens). Examples of interactions with Ethereum L1 defi applications (like Lido and Element) are coming soon. Defi interactions will not work on the Goerli testnet as the bridge contracts have not been deployed there.
+The `./src/latest/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transfering and withdrawing assets (Eth and tokens). Examples of interactions with Ethereum L1 defi applications (like Lido and Element) are coming soon. Defi interactions will not work on the Goerli testnet as the bridge contracts have not been deployed there.
 
 ### Demo web app
 
@@ -48,7 +48,7 @@ See `./web-app` for an example Next.js application.
 
 Accounts in Aztec work differently than accounts in Ethereum. There are two main parts to each Aztec account, an account and the associated signer (spending key). The private keys for each can be different, but don't have to be. The private key associated with the account is used to decrypt asset notes and used to register a distinct spending key. It is a best practice to register a new signer when an account is created to create separation between the decryption key and the spending key.
 
-In [zk.money](https://zk.money), Aztec accounts are generated using Ethereum accounts by having the user sign a message and deriving the Aztec keys the signed message (see `src/aztecKeys.ts`). Different messages are used to generate different keys.
+In [zk.money](https://zk.money), Aztec accounts are generated using Ethereum accounts by having the user sign a message and deriving the Aztec keys the signed message. Different messages are used to generate different keys.
 
 ### Signer (spending key)
 
