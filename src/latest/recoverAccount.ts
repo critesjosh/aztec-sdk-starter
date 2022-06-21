@@ -22,7 +22,7 @@ export async function recover(
   const tokenTransferFee = (await sdk.getRecoverAccountFees(feeAssetId))[
     settlementTime
   ];
-  const controller = sdk.createRecoverAccountController(
+  const controller = await sdk.createRecoverAccountController(
     alias,
     recoveryPayloads[0],
     deposit,
@@ -36,5 +36,6 @@ export async function recover(
   await controller.sign();
 
   let txId = await controller.send();
+
   return txId;
 }
