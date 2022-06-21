@@ -31,9 +31,10 @@ import {
     );
     await tokenDepositController.createProof();
     await tokenDepositController.sign();
-    // TODO: check if there is a pending deposit, if so skip to send()
-    await tokenDepositController.depositFundsToContract(); // for ETH, returns txHash
-    await tokenDepositController.awaitDepositFundsToContract();
+    if ((await tokenDepositController.getPendingFunds()) < tokenQuantity) {
+      await tokenDepositController.depositFundsToContract();
+      await tokenDepositController.awaitDepositFundsToContract();
+    }
     let txId = await tokenDepositController.send();
     return txId;
   }
