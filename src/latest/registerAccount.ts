@@ -2,6 +2,7 @@ import {
   AztecSdk,
   EthAddress,
   GrumpkinAddress,
+  RegisterController,
   TxId,
   TxSettlementTime,
 } from "@aztec/sdk";
@@ -17,7 +18,7 @@ export async function registerAccount(
   settlementTime: TxSettlementTime,
   depositor: EthAddress,
   sdk: AztecSdk
-) : Promise<TxId> {
+): Promise<{ controller: RegisterController; txId: TxId }> {
   const assetId = sdk.getAssetIdByAddress(tokenAddress);
   const deposit = { assetId, value: tokenQuantity };
   const txFee = (await sdk.getRegisterFees(deposit))[settlementTime];
@@ -32,13 +33,15 @@ export async function registerAccount(
     txFee,
     depositor
     // optional feePayer requires an Aztec Signer to pay the fee
-    );
+  );
 
-  await controller.depositFundsToContract();
-  await controller.awaitDepositFundsToContract();
+  if ((await controller.getPendingFunds()) < tokenQuantity) {
+    await controller.depositFundsToContract();
+    await controller.awaitDepositFundsToContract();
+  }
 
   await controller.createProof();
   await controller.sign();
   let txId = await controller.send();
-  return txId;
+  return { controller, txId };
 }
