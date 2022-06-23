@@ -110,7 +110,7 @@ const createKeysAndInitUsers = async () => {
         ),
         `spendable balance: ${sdk.fromBaseUnits({
           assetId: 0,
-          value: await sdk.getSpendableSum(account.privacyAccount.id, 0, false),
+          value: await sdk.getSpendableSum(account.privacyAccount.id, 0, true),
         })}
         `
       );
@@ -275,7 +275,6 @@ async function main() {
   // await recoverAccount();
   // await migrateAccount();
   // await testRecovery();
-  console.log('is registered',(await sdk.isAccountRegistered(accounts[defaultAccountIndex].privacyAccount.id)))
 }
 
 async function testRecovery() {
