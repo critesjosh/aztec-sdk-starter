@@ -25,31 +25,17 @@ import { addSpendingKeys } from "./addSpendingKeys";
 
 require("dotenv").config();
 
-const ethKeys = [
-  process.env.ETHEREUM_PRIVATE_KEY_0,
-  process.env.ETHEREUM_PRIVATE_KEY_1,
-  process.env.ETHEREUM_PRIVATE_KEY_2,
-];
-
-const ethAddresses: EthAddress[] = ethKeys.map((key) => {
-  return EthAddress.fromString(
-    ethers.utils.computeAddress(Buffer.from(key, "hex"))
-  );
-});
-
 const ETH_TOKEN_ADDRESS = EthAddress.ZERO;
 
 const ethersProvider = new JsonRpcProvider(process.env.ETHEREUM_HOST);
 const ethereumProvider: EthereumProvider = new EthersAdapter(ethersProvider);
 const walletProvider = new WalletProvider(ethereumProvider);
-ethKeys.forEach((key) => {
-  walletProvider.addAccount(Buffer.from(key, "hex"));
-});
+walletProvider.addAccountsFromMnemonic(process.env.MNEMONIC, 2) // add as many accounts as you want, just make sure they're funded
 
 type AccountKeys = {
   privateKey: Buffer;
   publicKey: GrumpkinAddress;
-}
+};
 
 // Account type just used in this script
 type Account = {
@@ -63,7 +49,8 @@ let sdk: AztecSdk,
   accounts: Account[],
   defaultAccountIndex: number = 0, // use this to easily switch Eth/Aztec account pair you are using
   recoveryPayloads: RecoveryPayload[],
-  alias: string = "test";
+  alias: string = "test62022-0",
+  tokenQuantity: bigint = ethers.utils.parseEther("0.01").toBigInt();
 
 const setupSdk = async () => {
   sdk = await createAztecSdk(walletProvider, {
@@ -72,18 +59,16 @@ const setupSdk = async () => {
     memoryDb: true,
     debug: "bb:*",
     flavour: SdkFlavour.PLAIN, // Use PLAIN with Nodejs
-    minConfirmation: 1,        // ETH block confirmations
+    minConfirmation: 1, // ETH block confirmations
   });
 
   await sdk.run();
 };
 
-const tokenQuantity: bigint = ethers.utils.parseEther("0.01").toBigInt();
-
 const createKeysAndInitUsers = async () => {
   // create Account and Spending keys for Ethereum accounts in .env
   accounts = await Promise.all(
-    ethAddresses.map(async (address) => {
+    walletProvider.getAccounts().map(async (address) => {
       let account = {
         privacyAccountKeys: null,
         spendingAccountKeys: [],
@@ -91,7 +76,9 @@ const createKeysAndInitUsers = async () => {
         signer: null,
       };
       account.privacyAccountKeys = await sdk.generateAccountKeyPair(address);
-      account.spendingAccountKeys.push(await sdk.generateSpendingKeyPair(address));
+      account.spendingAccountKeys.push(
+        await sdk.generateSpendingKeyPair(address)
+      );
       return account;
     })
   );
@@ -123,7 +110,7 @@ const createKeysAndInitUsers = async () => {
         ),
         `spendable balance: ${sdk.fromBaseUnits({
           assetId: 0,
-          value: await sdk.getSpendableSum(account.privacyAccount.id, 0),
+          value: await sdk.getSpendableSum(account.privacyAccount.id, 0, true),
         })}
         `
       );
@@ -131,7 +118,10 @@ const createKeysAndInitUsers = async () => {
   );
 
   // used when registering or migrating an account
-  const thirdPartySigner = await sdk.createSchnorrSigner(Buffer.alloc(32, 3, "hex"));
+  // this is a very insecure private key, just used for demo purposes
+  const thirdPartySigner = await sdk.createSchnorrSigner(
+    Buffer.alloc(32, 3, "hex")
+  );
   const trustedThirdPartyPublicKey = thirdPartySigner.getPublicKey();
   recoveryPayloads = await sdk.generateAccountRecoveryData(
     accounts[defaultAccountIndex].privacyAccount.id,
@@ -143,7 +133,7 @@ const createKeysAndInitUsers = async () => {
 // Deposit Ethereum assets to Aztec
 async function depositAssets() {
   let txId = await depositEthToAztec(
-    ethAddresses[defaultAccountIndex],
+    walletProvider.getAccounts()[defaultAccountIndex],
     accounts[defaultAccountIndex].privacyAccount.id,
     tokenQuantity,
     TxSettlementTime.NEXT_ROLLUP,
@@ -156,10 +146,10 @@ async function depositAssets() {
 // Register a new spending key, alias, and optional recovery key
 // includes an optional deposit
 async function registerSigner() {
-  let alias = "test";
+  
   let recoveryPublicKey = recoveryPayloads[0].recoveryPublicKey;
 
-  let txId = registerAccount(
+  let { controller, txId } = await registerAccount(
     accounts[defaultAccountIndex].privacyAccount.id, // public key of the account to register for
     alias,
     accounts[defaultAccountIndex].privacyAccountKeys.privateKey, // private key used to register the signer
@@ -168,17 +158,18 @@ async function registerSigner() {
     ETH_TOKEN_ADDRESS, // used to get the ETH asset Id on Aztec
     tokenQuantity, // deposit amount
     TxSettlementTime.NEXT_ROLLUP, // cheaper but slower than TxSettlementTime.INSTANT
-    ethAddresses[0], // depositor Ethereum account
+    walletProvider.getAccounts()[defaultAccountIndex], // depositor Ethereum account
     sdk
   );
   console.log("register txId", txId.toString());
+
+  await controller.awaitSettlement();
 }
 
-async function addSpendingKeysToAccount(){
-
+async function addSpendingKeysToAccount() {
   // these new signers can have any private key. These are simple to remember
-  let newSigner1 = await sdk.createSchnorrSigner(Buffer.alloc(32, 1, "hex"))
-  let newSigner2 = await sdk.createSchnorrSigner(Buffer.alloc(32, 2, "hex"))
+  let newSigner1 = await sdk.createSchnorrSigner(Buffer.alloc(32, 1, "hex"));
+  let newSigner2 = await sdk.createSchnorrSigner(Buffer.alloc(32, 2, "hex"));
 
   let txId = await addSpendingKeys(
     accounts[defaultAccountIndex].privacyAccount.id,
@@ -188,9 +179,9 @@ async function addSpendingKeysToAccount(){
     newSigner2.getPublicKey(),
     TxSettlementTime.NEXT_ROLLUP,
     sdk
-  )
+  );
 
-  console.log('signers added', txId.toString())
+  console.log("signers added", txId.toString());
 }
 
 // Transfer notes within Aztec
@@ -212,7 +203,7 @@ async function transferAssets() {
 async function withdrawAssets() {
   let txId = await withdrawTokens(
     accounts[defaultAccountIndex].privacyAccount.id,
-    ethAddresses[defaultAccountIndex],
+    walletProvider.getAccounts()[defaultAccountIndex],
     ETH_TOKEN_ADDRESS,
     tokenQuantity,
     TxSettlementTime.NEXT_ROLLUP,
@@ -226,8 +217,6 @@ async function withdrawAssets() {
 // This function migrates your account so that your alias can be associated with new account keys and new spending keys
 // this function can only be called once per account
 async function migrateAccount() {
-  let alias = "test";
-
   // These new keys that are generated should be done deterministically so that they can be derived again
   // or saved so that they are not lost.
   // These keys can be 32 random bytes.
@@ -251,20 +240,28 @@ async function migrateAccount() {
 
 // Add the recovery public key to the list of spending keys.
 // Pay the fee from an eth address.
-// The RecoverAccountController wraps the DespoitController, so depositing assets at the same time is an option 
+// The RecoverAccountController wraps the DespoitController, so depositing assets at the same time is an option
 async function recoverAccount() {
-  let txId = recover(
+  if (
+    (await sdk.isAccountRegistered(
+      accounts[defaultAccountIndex].privacyAccount.id
+    )) === false
+  ) {
+    throw new Error("account must be registered before it can be recovered");
+  }
+
+  let txId = await recover(
     recoveryPayloads,
-    ETH_TOKEN_ADDRESS, // fee assest
-    alias,             // alias of account to recover
-    tokenQuantity,     // amount to deposit
+    ETH_TOKEN_ADDRESS, // fee asset
+    alias, // alias of account to recover
+    tokenQuantity, // amount to deposit
     ETH_TOKEN_ADDRESS, // asset to deposit
-    ethAddresses[defaultAccountIndex],   // Ethereum address to deposit from
+    walletProvider.getAccounts()[defaultAccountIndex], // Ethereum address to deposit from
     TxSettlementTime.NEXT_ROLLUP,
     sdk
   );
 
-  console.log('recovery txId', txId.toString())
+  console.log("recovery txId", txId.toString());
 }
 
 async function main() {
@@ -277,5 +274,14 @@ async function main() {
   // await withdrawAssets();
   // await recoverAccount();
   // await migrateAccount();
+  // await testRecovery();
+}
+
+async function testRecovery() {
+  alias = "test61722-3"
+  tokenQuantity = ethers.utils.parseEther("0.1").toBigInt();  
+  defaultAccountIndex = 0 // use this to easily switch Eth/Aztec account pair you are using
+  await registerSigner();
+  await recoverAccount();
 }
 main();
