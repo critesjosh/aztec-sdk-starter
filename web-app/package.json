@@ -16,7 +16,7 @@
     "react-dom": "18.1.0"
   },
   "devDependencies": {
-    "@aztec/sdk": "2.1.5",
+    "@aztec/sdk": "2.1.23",
     "@types/node": "17.0.35",
     "@types/react": "18.0.9",
     "@types/react-dom": "18.0.5",
