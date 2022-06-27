@@ -33,7 +33,6 @@ const Home: NextPage = () => {
   const [ethAccount, setEthAccount] = useState<EthAddress | null>(null);
   const [sdk, setSdk] = useState<null | AztecSdk>(null);
   const [account0, setAccount0] = useState<AztecSdkUser | null>(null);
-  const [account1, setAccount1] = useState<AztecSdkUser | null>(null);
   const [userExists, setUserExists] = useState<boolean>(false);
   const [accountPrivateKey, setAccountPrivateKey] = useState<Buffer | null>(null);
   const [accountPublicKey, setAccountPublicKey] = useState<GrumpkinAddress | null>(null);
