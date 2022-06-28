@@ -1,7 +1,9 @@
 import {
   AztecSdk,
   AztecSdkUser,
+  BridgeId,
   createAztecSdk,
+  DefiSettlementTime,
   EthersAdapter,
   EthAddress,
   EthereumProvider,
@@ -22,6 +24,7 @@ import { withdrawTokens } from "./withdrawNotes";
 import { migrate } from "./migrateAccount";
 import { recover } from "./recoverAccount";
 import { addSpendingKeys } from "./addSpendingKeys";
+import { bridgeToDefi } from "./defiBridge";
 
 require("dotenv").config();
 
@@ -30,7 +33,7 @@ const ETH_TOKEN_ADDRESS = EthAddress.ZERO;
 const ethersProvider = new JsonRpcProvider(process.env.ETHEREUM_HOST);
 const ethereumProvider: EthereumProvider = new EthersAdapter(ethersProvider);
 const walletProvider = new WalletProvider(ethereumProvider);
-walletProvider.addAccountsFromMnemonic(process.env.MNEMONIC, 2) // add as many accounts as you want, just make sure they're funded
+walletProvider.addAccountsFromMnemonic(process.env.MNEMONIC, 2); // add as many accounts as you want, just make sure they're funded
 
 type AccountKeys = {
   privateKey: Buffer;
@@ -146,7 +149,6 @@ async function depositAssets() {
 // Register a new spending key, alias, and optional recovery key
 // includes an optional deposit
 async function registerSigner() {
-  
   let recoveryPublicKey = recoveryPayloads[0].recoveryPublicKey;
 
   let { controller, txId } = await registerAccount(
@@ -174,7 +176,6 @@ async function addSpendingKeysToAccount() {
   let txId = await addSpendingKeys(
     accounts[defaultAccountIndex].privacyAccount.id,
     accounts[defaultAccountIndex].signer,
-    alias,
     newSigner1.getPublicKey(),
     newSigner2.getPublicKey(),
     TxSettlementTime.NEXT_ROLLUP,
@@ -197,6 +198,7 @@ async function transferAssets() {
   );
 
   console.log("transfer txId", txId.toString());
+  console.log(await accounts[defaultAccountIndex].privacyAccount.getTxs());
 }
 
 // Withdraw Aztec notes to Ethereum
@@ -227,7 +229,6 @@ async function migrateAccount() {
   let txId = await migrate(
     accounts[defaultAccountIndex].privacyAccount.id,
     accounts[defaultAccountIndex].signer,
-    alias,
     newSpendingKey.getPublicKey(),
     newRecoveryKey.getPublicKey(),
     newAccountPrivateKey,
@@ -253,7 +254,6 @@ async function recoverAccount() {
   let txId = await recover(
     recoveryPayloads,
     ETH_TOKEN_ADDRESS, // fee asset
-    alias, // alias of account to recover
     tokenQuantity, // amount to deposit
     ETH_TOKEN_ADDRESS, // asset to deposit
     walletProvider.getAccounts()[defaultAccountIndex], // Ethereum address to deposit from
@@ -263,6 +263,32 @@ async function recoverAccount() {
 
   console.log("recovery txId", txId.toString());
 }
+
+// This function will not work on the Goerli testnet
+async function defiInteraction() {
+  
+  // retrieved from falafel rollup processor server
+  const elementBridge = BridgeId.fromBigInt(
+    40785495301437048271833175014331070913778870844156528143330443265n // IN: DAI (1), OUT: DAI (1)
+  );
+  const ethToWstEth = BridgeId.fromBigInt(9903520314283042199192993797n); // IN: ETH (0), OUT: wstETH (2)
+  const WstEthToEth = BridgeId.fromBigInt(8589934597n); // IN: wstETH (2), OUT: ETH (0)
+  // TODO: include info about how to find input assets
+  // there are methods on the bridge to lookup asset inputs
+  // sdk.getBridgeAddressId;
+
+  // this sends 2 txs on Aztec. 1 to the bridge account, 1 from the bridge account to the defi app
+  let defiTxs = await bridgeToDefi(
+    accounts[defaultAccountIndex].privacyAccount,
+    accounts[defaultAccountIndex].signer,
+    ethToWstEth,
+    ETH_TOKEN_ADDRESS,
+    tokenQuantity,
+    DefiSettlementTime.NEXT_ROLLUP,
+    sdk
+  );
+  console.log('user defi transactions', defiTxs);
+};
 
 async function main() {
   await setupSdk();
@@ -274,14 +300,7 @@ async function main() {
   // await withdrawAssets();
   // await recoverAccount();
   // await migrateAccount();
-  // await testRecovery();
+  await defiInteraction();
 }
 
-async function testRecovery() {
-  alias = "test61722-3"
-  tokenQuantity = ethers.utils.parseEther("0.1").toBigInt();  
-  defaultAccountIndex = 0 // use this to easily switch Eth/Aztec account pair you are using
-  await registerSigner();
-  await recoverAccount();
-}
 main();
