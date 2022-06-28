@@ -11,7 +11,6 @@ import {
 export async function addSpendingKeys(
   user: GrumpkinAddress,
   signer: Signer,
-  alias: string,
   newSigner1: GrumpkinAddress,
   newSigner2: GrumpkinAddress,
   settlementTime: TxSettlementTime,
@@ -24,7 +23,6 @@ export async function addSpendingKeys(
   const controller = sdk.createAddSpendingKeyController(
     user,
     signer,
-    alias,
     newSigner1,
     newSigner2,
     fee

@@ -9,7 +9,6 @@ import {
   export async function migrate(
     user: GrumpkinAddress,
     signer: Signer,
-    alias: string,
     newSpendingPublicKey: GrumpkinAddress,
     recoveryPublicKey: GrumpkinAddress,
     newAccountPrivateKey: Buffer,
@@ -21,7 +20,6 @@ import {
     const controller = sdk.createMigrateAccountController(
       user,
       signer,
-      alias,
       newAccountPrivateKey,
       newSpendingPublicKey,
       recoveryPublicKey,
