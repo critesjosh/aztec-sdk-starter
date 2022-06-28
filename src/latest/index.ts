@@ -275,7 +275,6 @@ async function defiInteraction() {
   const WstEthToEth = BridgeId.fromBigInt(8589934597n); // IN: wstETH (2), OUT: ETH (0)
   // TODO: include info about how to find input assets
   // there are methods on the bridge to lookup asset inputs
-  // sdk.getBridgeAddressId;
 
   // this sends 2 txs on Aztec. 1 to the bridge account, 1 from the bridge account to the defi app
   let defiTxs = await bridgeToDefi(
