@@ -9,7 +9,6 @@ import {
 export async function recover(
   recoveryPayloads: RecoveryPayload[],
   feeAsset: EthAddress,
-  alias: string,
   depositAmount: bigint,
   depositAsset: EthAddress,
   depositor: EthAddress,
@@ -23,7 +22,6 @@ export async function recover(
     settlementTime
   ];
   const controller = await sdk.createRecoverAccountController(
-    alias,
     recoveryPayloads[0],
     deposit,
     tokenTransferFee,
