@@ -63,10 +63,11 @@ const Home: NextPage = () => {
         );
 
         const sdk = await createAztecSdk(ethereumProvider, {
-          serverUrl: "https://aztec-connect-testnet-sdk.aztec.network", // goerli testnet
+          serverUrl: "https://api.aztec.network/aztec-connect-testnet/falafel", // goerli testnet
           pollInterval: 1000,
           memoryDb: true,
           debug: "bb:*",
+          flavour: SdkFlavour.PLAIN,
           minConfirmation: 1, // ETH block confirmations
         });
 

@@ -4,13 +4,13 @@ import {
   BridgeId,
   DefiSettlementTime,
   EthAddress,
-  SchnorrSigner,
+  Signer,
   UserDefiTx,
 } from "@aztec/sdk";
 
 export async function bridgeToDefi(
   user: AztecSdkUser,
-  signer: SchnorrSigner,
+  signer: Signer,
   bridge: BridgeId,
   tokenAddress: EthAddress,
   tokenQuantity: bigint,
