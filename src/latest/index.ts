@@ -27,7 +27,7 @@ import { addSpendingKeys } from "./addSpendingKeys";
 import { bridgeToDefi } from "./defiBridge";
 import { createLidoAdaptor } from "./defiAdaptors/lidoAdaptor";
 import { createElementAdaptor } from "./defiAdaptors/elementAdaptor";
-import { AZTEC_ASSETS } from "../../config"
+import { AZTEC_ASSETS } from "../../config";
 
 require("dotenv").config();
 
@@ -268,14 +268,17 @@ async function recoverAccount() {
 }
 
 // This function will not work on the Goerli testnet
-// All addresses and references are for an internal mainnet fork 
+// All addresses and references are for an internal mainnet fork
 async function defiInteraction() {
-
   // find info about deployed bridge contract on mainnet here
   // https://github.com/AztecProtocol/aztec-connect-bridges
 
-  const LidoId    = sdk.getBridgeAddressId(EthAddress.fromString("0x3C4711e5DE575aE19c9B09626EDC7Cb540027e36"))
-  const ElementId = sdk.getBridgeAddressId(EthAddress.fromString("0xC116ecc074040AbEdB2E11A4e84dEcDBA141F38f"))
+  const LidoId = sdk.getBridgeAddressId(
+    EthAddress.fromString("0x3C4711e5DE575aE19c9B09626EDC7Cb540027e36")
+  );
+  const ElementId = sdk.getBridgeAddressId(
+    EthAddress.fromString("0xC116ecc074040AbEdB2E11A4e84dEcDBA141F38f")
+  );
 
   const ethToWstEth = new BridgeId(LidoId, 0, 2); // IN: ETH (0), OUT: wstETH (2)
   const WstEthToEth = new BridgeId(LidoId, 2, 0); // IN: wstETH (2), OUT: ETH (0)
@@ -288,12 +291,28 @@ async function defiInteraction() {
   );
   // Element bridge auxData is the tranche expiry time
   // https://github.com/AztecProtocol/aztec-connect-bridges/blob/2f85d04e445eebd508b666bc1e29bcbc9955ebb0/src/bridges/element/ElementBridge.sol#L129
-  let elementAuxData = await elementAdaptor.getAuxData(AZTEC_ASSETS[1], undefined, AZTEC_ASSETS[1], undefined)
+  let elementAuxData = await elementAdaptor.getAuxData(
+    AZTEC_ASSETS[1],
+    undefined,
+    AZTEC_ASSETS[1],
+    undefined
+  );
   // The Element bridge uses auxData, the Lido/Curve bridges do not
-  const elementBridge = new BridgeId(ElementId, 1, 1, undefined, undefined, Number(elementAuxData[0])); // IN: DAI (1), OUT: DAI (1)
+  const elementBridge = new BridgeId(
+    ElementId,
+    1,
+    1,
+    undefined,
+    undefined,
+    Number(elementAuxData[0])
+  ); // IN: DAI (1), OUT: DAI (1)
 
-  const wstEthTokenAddress = EthAddress.fromString("0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0")
-  const daiTokenAddress    = EthAddress.fromString("0x6B175474E89094C44Da98b954EedeAC495271d0F")
+  const wstEthTokenAddress = EthAddress.fromString(
+    "0x7f39C581F595B53c5cb19bD0b3f8dA6c935E2Ca0"
+  );
+  const daiTokenAddress = EthAddress.fromString(
+    "0x6B175474E89094C44Da98b954EedeAC495271d0F"
+  );
 
   // this sends 2 txs on Aztec. 1 to the bridge account, 1 from the bridge account to the defi app
   let defiTxs = await bridgeToDefi(
@@ -320,7 +339,7 @@ async function main() {
   // await withdrawAssets();
   // await recoverAccount();
   // await migrateAccount();
-  await defiInteraction();
+  // await defiInteraction();
 }
 
 main();
