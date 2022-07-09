@@ -2,7 +2,7 @@
 
 SDK setup and examples are in `./src/latest/index.ts`. Configured to work with Aztec on the Goerli testnet. 
 
-We are currently working on getting a public testnet with mainnet functional parity (which includes Ethereum interactions). This is difficult to do on Goerli since Aztec Connect interacts directly with protocols on L1 and not all of these protocols are on Goerli.
+We are currently working on getting a public testnet with mainnet functional parity (which includes Ethereum base layer smart contract interactions). This is difficult to do on Goerli since Aztec Connect interacts directly with protocols on L1 and not all of these protocols are on Goerli.
 
 ## Requirements
 
