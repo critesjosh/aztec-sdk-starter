@@ -32,13 +32,23 @@ yarn go
 
 The script currently runs on a version of Aztec connected to the Goerli testnet.
 
+The rollup processor endpoint for Goerli is:
+
+```
+https://api.aztec.network/aztec-connect-testnet/falafel
+```
+
+and for Ethereum mainnet is:
+
+```
+https://api.aztec.network/aztec-connect-prod/falafel
+```
+
+The `.env.example` file contains these endpoints as well.
+
 You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-testnet/falafel/status and check the testnet block explorer here: https://aztec-connect-testnet-explorer.aztec.network/
 
 It may also be helpful to cross reference data and transaction histories with the Goerli version of zk.money. https://aztec-connect-testnet.zk.money/
-
-**This DAI isnt currently working on goerli**
-
-~~You can mint mock DAI on goerli by interacting with this contract `0x86166410b7a1a6d8b9df3660a978ea79aa1f30fd`. This encoded function call will mint you 10,000 mock DAI. `0x40c10f19000000000000000000000000302ce2faf4e3c75e8483456552dceab11205c3d600000000000000000000000000000000000000000000021e19e0c9bab2400000` just replace `302ce2faf4e3c75e8483456552dceab11205c3d6` with your Ethereum address. [Here](https://goerli.etherscan.io/tx/0x13201e94ed14db1584b1cbc6f98eea1be903fda24c110cd9d1603e667d3293bb) is an example tx.~~
 
 ## Contents
 
@@ -50,17 +60,7 @@ See `./web-app` for an example Next.js application.
 
 ## Building Intuition for Aztec Accounts
 
-Accounts in Aztec work differently than accounts in Ethereum. There are two main parts to each Aztec account, an account and the associated signer (spending key). The private keys for each can be different, but don't have to be. The private key associated with the account is used to decrypt asset notes and used to register a distinct spending key. It is a best practice to register a new signer when an account is created to create separation between the decryption key and the spending key.
-
-In [zk.money](https://zk.money), Aztec accounts are generated using Ethereum accounts by having the user sign a message and deriving the Aztec keys the signed message. Different messages are used to generate different keys.
-
-### Signer (spending key)
-
-If the spending key is lost, a recovery flow can be initiated by the recovery account specified when the spending account was registered.
-
-The account signer is registered with a human-readable alias. The alias can be anything as long as it hasn't been claimed yet.
-
-Registering an account has an associated fee as it includes a token (or ETH) deposit and is posting transactions to the network.
+[The accounts page of the Aztec docs](https://docs.aztec.network/how-aztec-works/accounts) has the most up to date and comprehensive information on accounts.
 
 ## Debug
 
