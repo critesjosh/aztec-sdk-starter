@@ -1,3 +1,5 @@
+Learn more about the SDK on the Aztec documentation site [here](https://docs.aztec.network/sdk/overview).
+
 # Aztec SDK Reference script
 
 SDK setup and examples are in `./src/latest/index.ts`. Configured to work with Aztec on the Goerli testnet. 
