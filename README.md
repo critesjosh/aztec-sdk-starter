@@ -55,7 +55,7 @@ It may also be helpful to cross reference data and transaction histories with th
 
 ## Contents
 
-The `./src/latest/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transferring and withdrawing assets (Eth and tokens). Examples of interactions with Ethereum L1 defi applications (like Lido and Element) are coming soon. Defi interactions will not work on the Goerli testnet as the bridge contracts have not been deployed there.
+The `./src/latest/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transferring and withdrawing assets (Eth and tokens). Examples of interactions with Ethereum L1 defi applications (like Lido and Element) are coming soon.
 
 ### Demo web app
 
