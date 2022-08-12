@@ -2,15 +2,14 @@ Learn more about the SDK on the Aztec documentation site [here](https://docs.azt
 
 # Aztec SDK Reference script
 
-SDK setup and examples are in `./src/latest/index.ts`. Configured to work with Aztec on the Goerli testnet. 
+SDK setup and examples are in `./src/latest/index.ts`. Configured to work with Aztec on a mainnet fork testnet. 
 
-We are currently working on getting a public testnet with mainnet functional parity (which includes Ethereum base layer smart contract interactions). This is difficult to do on Goerli since Aztec Connect interacts directly with protocols on L1 and not all of these protocols are on Goerli.
 
 ## Requirements
 
 1. Node
 2. Yarn
-3. Goerli ETH. You can get some here. https://goerli-faucet.mudit.blog/
+3. mainnet fork ETH. you can get some by pinging me on discord at joshc#0001 or on twitter @critesjosh_
 
 ## Run
 
@@ -22,7 +21,7 @@ yarn
 
 When you asked for which version of `aztec/bridge-clients` to use, pick the highest version number.
 
-1. Create your `.env` file and add your Ethereum private key or mnemonic with Goerli ETH.
+1. Create your `.env` file and add your Ethereum private key or mnemonic
 
 2. Run script, `./src/latest/index.ts`:
 
@@ -34,9 +33,9 @@ At the bottom of `./src/latest/index.ts` is a function named `main` where you ca
 
 ## Environment
 
-The script currently runs on a version of Aztec connected to the Goerli testnet.
+The script currently runs on a version of Aztec connected to a mainnet fork testnet.
 
-The rollup processor endpoint for Goerli is:
+The rollup processor endpoint for the testnet is:
 
 ```
 https://api.aztec.network/aztec-connect-testnet/falafel
@@ -52,7 +51,7 @@ The `.env.example` file contains these endpoints as well.
 
 You can check the status of the Aztec rollup provider at this url. https://api.aztec.network/aztec-connect-testnet/falafel/status and check the testnet block explorer here: https://aztec-connect-testnet-explorer.aztec.network/
 
-It may also be helpful to cross reference data and transaction histories with the Goerli version of zk.money. https://aztec-connect-testnet.zk.money/
+It may also be helpful to cross reference data and transaction histories with the testnet version of zk.money. https://aztec-connect-testnet.zk.money/
 
 ## Contents
 
