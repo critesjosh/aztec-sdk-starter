@@ -1,7 +1,7 @@
 import {
   AztecSdk,
   AztecSdkUser,
-  BridgeId,
+  BridgeCallData,
   createAztecSdk,
   DefiSettlementTime,
   EthersAdapter,
@@ -280,8 +280,8 @@ async function defiInteraction() {
     EthAddress.fromString("0xC116ecc074040AbEdB2E11A4e84dEcDBA141F38f")
   );
 
-  const ethToWstEth = new BridgeId(LidoId, 0, 2); // IN: ETH (0), OUT: wstETH (2)
-  const WstEthToEth = new BridgeId(LidoId, 2, 0); // IN: wstETH (2), OUT: ETH (0)
+  const ethToWstEth = new BridgeCallData(LidoId, 0, 2); // IN: ETH (0), OUT: wstETH (2)
+  const WstEthToEth = new BridgeCallData(LidoId, 2, 0); // IN: wstETH (2), OUT: ETH (0)
 
   const elementAdaptor = createElementAdaptor(
     ethereumProvider,
@@ -298,7 +298,7 @@ async function defiInteraction() {
     undefined
   );
   // The Element bridge uses auxData, the Lido/Curve bridges do not
-  const elementBridge = new BridgeId(
+  const elementBridge = new BridgeCallData(
     ElementId,
     1,
     1,
