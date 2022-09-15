@@ -37,6 +37,7 @@ const Home: NextPage = () => {
   const [accountPrivateKey, setAccountPrivateKey] = useState<Buffer | null>(null);
   const [accountPublicKey, setAccountPublicKey] = useState<GrumpkinAddress | null>(null);
   const [spendingSigner, setSpendingSigner] = useState<SchnorrSigner | undefined>(undefined);
+  const [amount, setAmount] = useState(0);
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -53,7 +54,7 @@ const Home: NextPage = () => {
           method: "eth_requestAccounts",
         });
         setEthAccount(EthAddress.fromString(accounts[0]));
-        
+
 
         const ethersProvider: Web3Provider = new ethers.providers.Web3Provider(
           window.ethereum
@@ -104,7 +105,7 @@ const Home: NextPage = () => {
 
     setAccount0(account0!);
 
-    if((await sdk?.isAccountRegistered(accountPublicKey!)))
+    if ((await sdk?.isAccountRegistered(accountPublicKey!)))
       setUserExists(true);
 
     await account0.awaitSynchronised();
@@ -127,7 +128,7 @@ const Home: NextPage = () => {
   async function registerNewAccount() {
     let alias = "test232";
     const depositTokenQuantity: bigint = ethers.utils
-      .parseEther("0.01")
+      .parseEther(amount.toString())
       .toBigInt();
     const recoverySigner = await sdk!.createSchnorrSigner(randomBytes(32));
     let recoverPublicKey = recoverySigner.getPublicKey();
@@ -152,7 +153,7 @@ const Home: NextPage = () => {
 
   async function depositEth() {
     const depositTokenQuantity: bigint = ethers.utils
-      .parseEther("0.01")
+      .parseEther(amount.toString())
       .toBigInt();
 
     let txId = await depositEthToAztec(
@@ -202,6 +203,23 @@ const Home: NextPage = () => {
             <button onClick={() => getSpendingKey()}>
               Create Spending Key (signer)
             </button>
+          ) : (
+            ""
+          )}
+          {spendingSigner ? (
+            <form>
+              <label>
+                Deposit Amount:
+                <input
+                  type="number"
+                  step="0.000000000000000001"
+                  min="0.000000000000000001"
+                  value={amount}
+                  onChange={(e) => setAmount(e.target.valueAsNumber)}
+                />
+              </label>
+            </form>
+
           ) : (
             ""
           )}
