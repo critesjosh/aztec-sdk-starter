@@ -213,10 +213,11 @@ const Home: NextPage = () => {
                 <input
                   type="number"
                   step="0.000000000000000001"
-                  min="0.000000000000000001"
+                  min="0.01"
                   value={amount}
                   onChange={(e) => setAmount(e.target.valueAsNumber)}
                 />
+                ETH
               </label>
             </form>
 
