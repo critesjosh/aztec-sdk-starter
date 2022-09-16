@@ -193,21 +193,16 @@ const Home: NextPage = () => {
             <button onClick={() => login()}>Login</button>
           )}
           {spendingSigner && !userExists ? (
-            <div>
-              <form>
-                <label>
-                  Alias:
-                  <input
-                    type="text"
-                    value={alias}
-                    onChange={(e) => setAlias(e.target.value)}
-                  />
-                </label>
-              </form>
-              <button onClick={() => registerNewAccount()}>
-                Register Alias + Deposit ETH
-              </button>
-            </div>
+            <form>
+              <label>
+                Alias:
+                <input
+                  type="text"
+                  value={alias}
+                  onChange={(e) => setAlias(e.target.value)}
+                />
+              </label>
+            </form>
           ) : (
             ""
           )}
@@ -219,19 +214,28 @@ const Home: NextPage = () => {
             ""
           )}
           {spendingSigner ? (
-            <form>
-              <label>
-                Deposit Amount:
-                <input
-                  type="number"
-                  step="0.000000000000000001"
-                  min="0.01"
-                  value={amount}
-                  onChange={(e) => setAmount(e.target.valueAsNumber)}
-                />
-                ETH
-              </label>
-            </form>
+            <div>
+              <form>
+                <label>
+                  Deposit Amount:
+                  <input
+                    type="number"
+                    step="0.000000000000000001"
+                    min="0.01"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.valueAsNumber)}
+                  />
+                  ETH
+                </label>
+              </form>
+              {!userExists ? (
+                <button onClick={() => registerNewAccount()}>
+                  Register Alias + Deposit ETH
+                </button>
+              ) : (
+                ""
+              )}
+            </div>
           ) : (
             ""
           )}
