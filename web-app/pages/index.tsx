@@ -187,7 +187,7 @@ const Home: NextPage = () => {
         <div>
           {accountPrivateKey ? (
             <button onClick={() => initUsersAndPrintBalances()}>
-              init users, log balances
+              Init User / Log Balance
             </button>
           ) : (
             <button onClick={() => login()}>Login</button>
@@ -208,7 +208,7 @@ const Home: NextPage = () => {
           )}
           {!spendingSigner && account0 ? (
             <button onClick={() => getSpendingKey()}>
-              Create Spending Key (signer)
+              Create Spending Key (Signer)
             </button>
           ) : (
             ""
@@ -230,7 +230,7 @@ const Home: NextPage = () => {
               </form>
               {!userExists ? (
                 <button onClick={() => registerNewAccount()}>
-                  Register Alias + Deposit ETH
+                  Register Alias + Deposit ≥0.1 ETH
                 </button>
               ) : (
                 ""
@@ -240,11 +240,11 @@ const Home: NextPage = () => {
             ""
           )}
           {spendingSigner && account0 ? (
-            <button onClick={() => depositEth()}>deposit .01 eth</button>
+            <button onClick={() => depositEth()}>Deposit ETH</button>
           ) : (
             ""
           )}
-          <button onClick={() => console.log("sdk", sdk)}>log sdk</button>
+          <button onClick={() => console.log("sdk", sdk)}>Log SDK</button>
         </div>
       ) : (
         ""
