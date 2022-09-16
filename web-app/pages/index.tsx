@@ -37,6 +37,8 @@ const Home: NextPage = () => {
   const [accountPrivateKey, setAccountPrivateKey] = useState<Buffer | null>(null);
   const [accountPublicKey, setAccountPublicKey] = useState<GrumpkinAddress | null>(null);
   const [spendingSigner, setSpendingSigner] = useState<SchnorrSigner | undefined>(undefined);
+  const [alias, setAlias] = useState("");
+  const [amount, setAmount] = useState(0);
 
   useEffect(() => {
     if (typeof window.ethereum !== "undefined") {
@@ -53,7 +55,7 @@ const Home: NextPage = () => {
           method: "eth_requestAccounts",
         });
         setEthAccount(EthAddress.fromString(accounts[0]));
-        
+
 
         const ethersProvider: Web3Provider = new ethers.providers.Web3Provider(
           window.ethereum
@@ -104,7 +106,7 @@ const Home: NextPage = () => {
 
     setAccount0(account0!);
 
-    if((await sdk?.isAccountRegistered(accountPublicKey!)))
+    if ((await sdk?.isAccountRegistered(accountPublicKey!)))
       setUserExists(true);
 
     await account0.awaitSynchronised();
@@ -125,9 +127,8 @@ const Home: NextPage = () => {
   }
 
   async function registerNewAccount() {
-    let alias = "test232";
     const depositTokenQuantity: bigint = ethers.utils
-      .parseEther("0.01")
+      .parseEther(amount.toString())
       .toBigInt();
     const recoverySigner = await sdk!.createSchnorrSigner(randomBytes(32));
     let recoverPublicKey = recoverySigner.getPublicKey();
@@ -152,7 +153,7 @@ const Home: NextPage = () => {
 
   async function depositEth() {
     const depositTokenQuantity: bigint = ethers.utils
-      .parseEther("0.01")
+      .parseEther(amount.toString())
       .toBigInt();
 
     let txId = await depositEthToAztec(
@@ -186,31 +187,64 @@ const Home: NextPage = () => {
         <div>
           {accountPrivateKey ? (
             <button onClick={() => initUsersAndPrintBalances()}>
-              init users, log balances
+              Init User / Log Balance
             </button>
           ) : (
             <button onClick={() => login()}>Login</button>
           )}
           {spendingSigner && !userExists ? (
-            <button onClick={() => registerNewAccount()}>
-              Register new account
-            </button>
+            <form>
+              <label>
+                Alias:
+                <input
+                  type="text"
+                  value={alias}
+                  onChange={(e) => setAlias(e.target.value)}
+                />
+              </label>
+            </form>
           ) : (
             ""
           )}
           {!spendingSigner && account0 ? (
             <button onClick={() => getSpendingKey()}>
-              Create Spending Key (signer)
+              Create Spending Key (Signer)
             </button>
           ) : (
             ""
           )}
-          {spendingSigner && account0 ? (
-            <button onClick={() => depositEth()}>deposit .01 eth</button>
+          {spendingSigner ? (
+            <div>
+              <form>
+                <label>
+                  Deposit Amount:
+                  <input
+                    type="number"
+                    step="0.000000000000000001"
+                    min="0.01"
+                    value={amount}
+                    onChange={(e) => setAmount(e.target.valueAsNumber)}
+                  />
+                  ETH
+                </label>
+              </form>
+              {!userExists ? (
+                <button onClick={() => registerNewAccount()}>
+                  Register Alias + Deposit ≥0.1 ETH
+                </button>
+              ) : (
+                ""
+              )}
+            </div>
           ) : (
             ""
           )}
-          <button onClick={() => console.log("sdk", sdk)}>log sdk</button>
+          {spendingSigner && account0 ? (
+            <button onClick={() => depositEth()}>Deposit ETH</button>
+          ) : (
+            ""
+          )}
+          <button onClick={() => console.log("sdk", sdk)}>Log SDK</button>
         </div>
       ) : (
         ""
