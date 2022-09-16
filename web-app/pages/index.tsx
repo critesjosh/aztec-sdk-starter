@@ -37,6 +37,7 @@ const Home: NextPage = () => {
   const [accountPrivateKey, setAccountPrivateKey] = useState<Buffer | null>(null);
   const [accountPublicKey, setAccountPublicKey] = useState<GrumpkinAddress | null>(null);
   const [spendingSigner, setSpendingSigner] = useState<SchnorrSigner | undefined>(undefined);
+  const [alias, setAlias] = useState("");
   const [amount, setAmount] = useState(0);
 
   useEffect(() => {
@@ -126,7 +127,6 @@ const Home: NextPage = () => {
   }
 
   async function registerNewAccount() {
-    let alias = "test232";
     const depositTokenQuantity: bigint = ethers.utils
       .parseEther(amount.toString())
       .toBigInt();
@@ -193,9 +193,21 @@ const Home: NextPage = () => {
             <button onClick={() => login()}>Login</button>
           )}
           {spendingSigner && !userExists ? (
-            <button onClick={() => registerNewAccount()}>
-              Register new account
-            </button>
+            <div>
+              <form>
+                <label>
+                  Alias:
+                  <input
+                    type="text"
+                    value={alias}
+                    onChange={(e) => setAlias(e.target.value)}
+                  />
+                </label>
+              </form>
+              <button onClick={() => registerNewAccount()}>
+                Register Alias + Deposit ETH
+              </button>
+            </div>
           ) : (
             ""
           )}
@@ -220,7 +232,6 @@ const Home: NextPage = () => {
                 ETH
               </label>
             </form>
-
           ) : (
             ""
           )}
