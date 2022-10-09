@@ -10,7 +10,7 @@
     "copy-wasm": "cp ./node_modules/@aztec/barretenberg/wasm/barretenberg.wasm ./public/ && cp ./node_modules/@aztec/barretenberg/worker.js ./public/"
   },
   "dependencies": {
-    "@aztec/sdk": "2.1.39",
+    "@aztec/sdk": "2.1.45",
     "ethers": "^5.6.8",
     "next": "12.1.6",
     "react": "18.1.0",

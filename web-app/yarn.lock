@@ -22,10 +22,10 @@
     threads "1.7.0"
     tslib "^2.0.0"
 
-"@aztec/barretenberg@2.1.39":
-  version "2.1.39"
-  resolved "https://registry.yarnpkg.com/@aztec/barretenberg/-/barretenberg-2.1.39.tgz#865b74e7fdf28487a4e5092e1fd9b832acece7bc"
-  integrity sha512-isbC4rqNkLd+Q/mJDWaG5l4Un56sHz5WbH4ifI/0h0BlYCL8PaAiW9G51k2vkryX8KG3dIW6WOHWOFEnX4O9xg==
+"@aztec/barretenberg@2.1.45":
+  version "2.1.45"
+  resolved "https://registry.yarnpkg.com/@aztec/barretenberg/-/barretenberg-2.1.45.tgz#43fc9acd3612f9aab39945efb5af25d7f52a4103"
+  integrity sha512-rk2fhI9U+u5DnxBesBfeqUdZ43gVEymYlF71NcFqavetpiPYCIHSa6uySV+NJDHs9C2yrpNiUcj5jmIeZuZHEA==
   dependencies:
     "@types/detect-node" "^2.0.0"
     "@types/levelup" "^4.3.0"
@@ -42,13 +42,13 @@
     threads "1.7.0"
     tslib "^2.0.0"
 
-"@aztec/blockchain@2.1.39":
-  version "2.1.39"
-  resolved "https://registry.yarnpkg.com/@aztec/blockchain/-/blockchain-2.1.39.tgz#1b0fe2a2ac481da96505bdf38b39e8e090af41fe"
-  integrity sha512-e2qFd3VVFo0ySOCI7Ai/eew3ms+eNL2l8n3oUZg2egmgbLNNrezwm7gl9DRh1YMpQlqjPc4D88uVP2WwtymxYA==
+"@aztec/blockchain@2.1.45":
+  version "2.1.45"
+  resolved "https://registry.yarnpkg.com/@aztec/blockchain/-/blockchain-2.1.45.tgz#ff45f8078130dd1ef4e5a3fb3010b12769cf99e1"
+  integrity sha512-zBiMzdcOAHtW0dYoQo7U12hz48UKb8PVedilVkCgPdyrThyphn4X/J+0EOV9h5rwyG3XiyTJW/LX0nojc1lzcA==
   dependencies:
-    "@aztec/barretenberg" "2.1.39"
-    "@aztec/bridge-clients" "2.1.39"
+    "@aztec/barretenberg" "2.1.45"
+    "@aztec/bridge-clients" "2.1.45"
     "@ethersproject/experimental" "5.5.0"
     "@openzeppelin/contracts" "4.6.0"
     "@openzeppelin/contracts-upgradeable" "4.6.0"
@@ -61,10 +61,10 @@
     ethers "5.5.1"
     typescript "^4.4.4"
 
-"@aztec/bridge-clients@2.1.39":
-  version "0.1.57"
-  resolved "https://registry.yarnpkg.com/@aztec/bridge-clients/-/bridge-clients-0.1.57.tgz#471073b7b2e335dc50a451e3a019c9f13b8d7223"
-  integrity sha512-oHkNuKqGaO7c7r0q0GXtB6llI6a8+KtDH6eOI65R//jMACVaJwnE3EIpmnYF/q095zti5VcUZ+p9krvm2IDgJA==
+"@aztec/bridge-clients@2.1.45":
+  version "0.1.63"
+  resolved "https://registry.yarnpkg.com/@aztec/bridge-clients/-/bridge-clients-0.1.63.tgz#bd840a1d1887095f9012cf93e4e70ed98d629da3"
+  integrity sha512-hv/RrfBJaqBPm8OFCpFkSMKVLQNb4z1iP84MJMVeS4zX7yk2e4giksU129kVINSEx6CDxfd/xxuc05O9P/WOuw==
   dependencies:
     "@aztec/barretenberg" "2.1.37"
     "@ethersproject/providers" "^5.6.8"
@@ -78,13 +78,13 @@
     typechain "^7.0.1"
     typescript "^4.7.4"
 
-"@aztec/sdk@2.1.39":
-  version "2.1.39"
-  resolved "https://registry.yarnpkg.com/@aztec/sdk/-/sdk-2.1.39.tgz#c7e93c32a094844368c1688d8b6be636e2ac88fe"
-  integrity sha512-9J6ZZlit/OGa8MKLkFoP3pVzQyEIZlRh4qU9epv4tkclH+mDhFMRelX5mHPJfhKioXFnE7x9iG8o6BkLGhQ5/g==
+"@aztec/sdk@2.1.45":
+  version "2.1.45"
+  resolved "https://registry.yarnpkg.com/@aztec/sdk/-/sdk-2.1.45.tgz#d85bc58e5f3036601d499604bb4690efa0b262e7"
+  integrity sha512-f3zKFlvAA7dvJivyR+5JHQeSuEhbDiKzPTaH6ExCIWzXdRYwPfmfOb/9ejZsy6WNIUB6FmCBnBdND02D/nICgA==
   dependencies:
-    "@aztec/barretenberg" "2.1.39"
-    "@aztec/blockchain" "2.1.39"
+    "@aztec/barretenberg" "2.1.45"
+    "@aztec/blockchain" "2.1.45"
     broadcast-channel "^4.13.0"
     detect-node "^2.0.4"
     dexie "^3.0.1"

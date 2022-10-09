@@ -21,7 +21,7 @@ export async function registerAccount(
 ): Promise<{ controller: RegisterController; txId: TxId }> {
   const assetId = sdk.getAssetIdByAddress(tokenAddress);
   const deposit = { assetId, value: tokenQuantity };
-  const txFee = (await sdk.getRegisterFees(deposit))[settlementTime];
+  const txFee = (await sdk.getRegisterFees(deposit.assetId))[settlementTime];
 
   const controller = await sdk.createRegisterController(
     userId,
