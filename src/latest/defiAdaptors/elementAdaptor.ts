@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { BridgeDataFieldGetters } from '@aztec/bridge-clients/client-dest/src/client/bridge-data';
 import {
     ElementBridgeData,

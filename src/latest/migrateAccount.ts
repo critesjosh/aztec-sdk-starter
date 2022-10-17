@@ -1,4 +1,5 @@
 import {
+  AssetValue,
     EthAddress,
     AztecSdk,
     Signer,
@@ -17,12 +18,14 @@ import {
   ) : Promise<TxId> {
     const assetId = sdk.getAssetIdByAddress(feeAsset);
     const [fee] = await sdk.getRecoverAccountFees(assetId);
+    const deposit: AssetValue = {assetId: 0, value: BigInt(0)};
     const controller = sdk.createMigrateAccountController(
       user,
       signer,
       newAccountPrivateKey,
       newSpendingPublicKey,
       recoveryPublicKey,
+      deposit,
       fee
     );
     await controller.createProof();

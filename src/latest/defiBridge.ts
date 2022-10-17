@@ -1,7 +1,7 @@
 import {
   AztecSdk,
   AztecSdkUser,
-  BridgeId,
+  BridgeCallData,
   DefiSettlementTime,
   EthAddress,
   Signer,
@@ -11,7 +11,7 @@ import {
 export async function bridgeToDefi(
   user: AztecSdkUser,
   signer: Signer,
-  bridge: BridgeId,
+  bridge: BridgeCallData,
   tokenAddress: EthAddress,
   tokenQuantity: bigint,
   settlementTime: DefiSettlementTime,
