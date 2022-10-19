@@ -4,7 +4,7 @@
   "main": "src/index.ts",
   "license": "MIT",
   "scripts": {
-    "go": "ts-node src/latest/index.ts"
+    "go": "ts-node src/index.ts"
   },
   "dependencies": {
     "@aztec/sdk": "2.1.45",
