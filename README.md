@@ -9,7 +9,7 @@ SDK setup and examples are in `./src/latest/index.ts`. Configured to work with A
 
 1. Node
 2. Yarn
-3. mainnet fork ETH. you can get some by pinging me on discord at joshc#0001 or on twitter @critesjosh_
+3. mainnet fork ETH. Use the faucet here. https://aztec-connect-testnet-faucet.aztec.network/
 
 ## Run
 
@@ -23,13 +23,13 @@ When you asked for which version of `aztec/bridge-clients` to use, pick the high
 
 1. Create your `.env` file and add your Ethereum private key or mnemonic
 
-2. Run script, `./src/latest/index.ts`:
+2. Run script, `./src/index.ts`:
 
 ```shell
 yarn go
 ```
 
-At the bottom of `./src/latest/index.ts` is a function named `main` where you can turn the functions in the script on and off.
+At the bottom of `./src/index.ts` is a function named `main` where you can turn the functions in the script on and off.
 
 ## Environment
 
@@ -55,7 +55,7 @@ It may also be helpful to cross reference data and transaction histories with th
 
 ## Contents
 
-The `./src/latest/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transferring and withdrawing assets (Eth and tokens). Examples of interactions with Ethereum L1 defi applications (like Lido and Element) are coming soon.
+The `./src/index.ts` file contains a script that shows how to do many common operations on the Aztec network such as setting up the SDK, creating Aztec keys from an Ethereum private key, registering a new account, depositing transferring and withdrawing assets (Eth and tokens). Examples of interactions with Ethereum L1 defi applications (like Lido and Element) are coming soon.
 
 ### Demo web app
 
