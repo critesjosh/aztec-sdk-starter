@@ -1,9 +1,8 @@
-Learn more about the SDK on the Aztec documentation site [here](https://docs.aztec.network/sdk/overview).
-
 # Aztec SDK Reference script
 
-SDK setup and examples are in `./src/latest/index.ts`. Configured to work with Aztec on a mainnet fork testnet. 
+Learn more about the SDK on the Aztec documentation site [here](https://docs.aztec.network/sdk/overview).
 
+SDK setup and examples are in `./src/index.ts`. Configured to work with Aztec on a mainnet fork testnet.
 
 ## Requirements
 
@@ -59,7 +58,7 @@ The `./src/index.ts` file contains a script that shows how to do many common ope
 
 ### Demo web app
 
-See `./web-app` for an example Next.js application.
+Check out https://github.com/Globallager/aztec-frontend-boilerplate for a boilerplate React App frontend that uses the SDK.
 
 ## Building Intuition for Aztec Accounts
 
