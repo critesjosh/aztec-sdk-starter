@@ -27,12 +27,15 @@ import { addSpendingKeys } from "./addSpendingKeys";
 import { bridgeToDefi } from "./defiBridge";
 import { createLidoAdaptor } from "./defiAdaptors/lidoAdaptor";
 import { createElementAdaptor } from "./defiAdaptors/elementAdaptor";
-import { AZTEC_ASSETS } from "../../config";
-
+import { AZTEC_ASSETS } from "../config";
 require("dotenv").config();
 
-const ETH_TOKEN_ADDRESS = EthAddress.ZERO;
+/*
 
+Setup Ethereum accounts
+
+*/
+const ETH_TOKEN_ADDRESS = EthAddress.ZERO;
 const ethersProvider = new JsonRpcProvider(process.env.ETHEREUM_HOST);
 const ethereumProvider: EthereumProvider = new EthersAdapter(ethersProvider);
 const walletProvider = new WalletProvider(ethereumProvider);
@@ -51,24 +54,38 @@ type Account = {
   signer: SchnorrSigner;
 };
 
+/*
+
+Script variables
+
+*/
+
 let sdk: AztecSdk,
   accounts: Account[],
   defaultAccountIndex: number = 0, // use this to easily switch Eth/Aztec account pair you are using
   recoveryPayloads: RecoveryPayload[],
-  alias: string = "test62022-0",
+  alias: string = "test62022-0", // alias can be up to 20 alpha numeric characters
   tokenQuantity: bigint = ethers.utils.parseEther("0.01").toBigInt();
+
+
+/*
+
+Sdk Setup
+
+*/
 
 const setupSdk = async () => {
   sdk = await createAztecSdk(walletProvider, {
     serverUrl: process.env.ROLLUP_HOST,
-    pollInterval: 1000,
-    memoryDb: true,
+    pollInterval: 1000, // poll every 1s
+    // memoryDb: true, // when false, saves chain data locally
     debug: "bb:*",
     flavour: SdkFlavour.PLAIN, // Use PLAIN with Nodejs
     minConfirmation: 1, // ETH block confirmations
   });
 
   await sdk.run();
+  await sdk.awaitSynchronised();
 };
 
 const createKeysAndInitUsers = async () => {
@@ -136,21 +153,33 @@ const createKeysAndInitUsers = async () => {
   );
 };
 
-// Deposit Ethereum assets to Aztec
+/*
+
+Deposit
+
+*/
+
 async function depositAssets() {
   let txId = await depositEthToAztec(
     walletProvider.getAccounts()[defaultAccountIndex],
     accounts[defaultAccountIndex].privacyAccount.id,
     tokenQuantity,
-    TxSettlementTime.NEXT_ROLLUP,
+    TxSettlementTime.INSTANT,
     sdk
   );
 
   console.log("deposit txId", txId.toString());
 }
 
-// Register a new spending key, alias, and optional recovery key
-// includes an optional deposit
+/*
+
+Register Aztec Account
+
+ - register a new spending key, alias, and optional recovery key
+ - includes an optional deposit
+
+*/
+
 async function registerSigner() {
   let recoveryPublicKey = recoveryPayloads[0].recoveryPublicKey;
 
@@ -161,8 +190,8 @@ async function registerSigner() {
     accounts[defaultAccountIndex].signer.getPublicKey(), // public key of the new signer
     recoveryPublicKey, // public key of the recovery account
     ETH_TOKEN_ADDRESS, // used to get the ETH asset Id on Aztec
-    tokenQuantity, // deposit amount
-    TxSettlementTime.NEXT_ROLLUP, // cheaper but slower than TxSettlementTime.INSTANT
+    tokenQuantity,     // deposit amount
+    TxSettlementTime.INSTANT, // cheaper but slower than TxSettlementTime.INSTANT
     walletProvider.getAccounts()[defaultAccountIndex], // depositor Ethereum account
     sdk
   );
@@ -170,6 +199,14 @@ async function registerSigner() {
 
   await controller.awaitSettlement();
 }
+
+/*
+
+Add Spending Key
+
+ - add a spending key to an already registered account
+
+*/
 
 async function addSpendingKeysToAccount() {
   // these new signers can have any private key. These are simple to remember
@@ -188,14 +225,20 @@ async function addSpendingKeysToAccount() {
   console.log("signers added", txId.toString());
 }
 
-// Transfer notes within Aztec
+/*
+
+Transfer
+ - transfer assets on the Aztec L2 network
+
+*/
+
 async function transferAssets() {
   let txId = await sendAsset(
     accounts[defaultAccountIndex].privacyAccount.id, // from
     accounts[1].privacyAccount.id, // to
     ETH_TOKEN_ADDRESS, // assetId
     tokenQuantity, // amount
-    TxSettlementTime.NEXT_ROLLUP, // speed
+    TxSettlementTime.INSTANT, // speed
     sdk,
     accounts[defaultAccountIndex].signer
   );
@@ -204,14 +247,20 @@ async function transferAssets() {
   console.log(await accounts[defaultAccountIndex].privacyAccount.getTxs());
 }
 
-// Withdraw Aztec notes to Ethereum
+/*
+
+Withdraw
+ - withdraw assets from Aztec L2 to Ethereum L1
+
+*/
+
 async function withdrawAssets() {
   let txId = await withdrawTokens(
     accounts[defaultAccountIndex].privacyAccount.id,
     walletProvider.getAccounts()[defaultAccountIndex],
     ETH_TOKEN_ADDRESS,
     tokenQuantity,
-    TxSettlementTime.NEXT_ROLLUP,
+    TxSettlementTime.INSTANT,
     sdk,
     accounts[defaultAccountIndex].signer
   );
@@ -219,8 +268,14 @@ async function withdrawAssets() {
   console.log("withdraw txId", txId.toString());
 }
 
-// This function migrates your account so that your alias can be associated with new account keys and new spending keys
-// this function can only be called once per account
+/*
+
+Migrate a registered account
+ - this function migrates your account so that your alias can be associated with new account keys and new spending keys
+ - this function can only be called once per account
+
+*/
+
 async function migrateAccount() {
   // These new keys that are generated should be done deterministically so that they can be derived again
   // or saved so that they are not lost.
@@ -242,9 +297,16 @@ async function migrateAccount() {
   console.log("account migrated txId", txId.toString());
 }
 
-// Add the recovery public key to the list of spending keys.
-// Pay the fee from an eth address.
-// The RecoverAccountController wraps the DespoitController, so depositing assets at the same time is an option
+
+/*
+
+Recover a registered account
+ - add the recovery public key to the list of spending keys
+ - pay the fee from an eth address.
+ - the RecoverAccountController wraps the DespoitController, so depositing assets at the same time is an option
+
+*/
+
 async function recoverAccount() {
   if (
     (await sdk.isAccountRegistered(
@@ -267,10 +329,15 @@ async function recoverAccount() {
   console.log("recovery txId", txId.toString());
 }
 
-// This function will not work on the Goerli testnet
-// All addresses and references are for an internal mainnet fork
+/*
+
+Ethereum interaction
+ - interact with Ethereum L1 contracts directly from Aztec accounts on L2
+
+*/
+
 async function defiInteraction() {
-  // find info about deployed bridge contract on mainnet here
+  // find info about deployed bridge contracts on mainnet here
   // https://github.com/AztecProtocol/aztec-connect-bridges
 
   const LidoId = sdk.getBridgeAddressId(
@@ -314,7 +381,6 @@ async function defiInteraction() {
     "0x6B175474E89094C44Da98b954EedeAC495271d0F"
   );
 
-  // this sends 2 txs on Aztec. 1 to the bridge account, 1 from the bridge account to the defi app
   let defiTxs = await bridgeToDefi(
     accounts[defaultAccountIndex].privacyAccount,
     accounts[defaultAccountIndex].signer,
