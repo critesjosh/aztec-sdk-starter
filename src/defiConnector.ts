@@ -8,10 +8,10 @@ import {
   UserDefiTx,
 } from "@aztec/sdk";
 
-export async function bridgeToDefi(
+export async function ethConnector(
   user: AztecSdkUser,
   signer: Signer,
-  bridge: BridgeCallData,
+  connector: BridgeCallData,
   tokenAddress: EthAddress,
   tokenQuantity: bigint,
   settlementTime: DefiSettlementTime,
@@ -19,11 +19,11 @@ export async function bridgeToDefi(
 ): Promise<UserDefiTx[]> {
   const assetId = sdk.getAssetIdByAddress(tokenAddress);
   const tokenAssetValue = { assetId, value: tokenQuantity };
-  const fee = (await sdk.getDefiFees(bridge))[settlementTime];
+  const fee = (await sdk.getDefiFees(connector))[settlementTime];
   const controller = sdk.createDefiController(
     user.id,
     signer,
-    bridge,
+    connector,
     tokenAssetValue,
     fee
   );

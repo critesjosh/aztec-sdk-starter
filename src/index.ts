@@ -24,7 +24,7 @@ import { withdrawTokens } from "./withdrawNotes";
 import { migrate } from "./migrateAccount";
 import { recover } from "./recoverAccount";
 import { addSpendingKeys } from "./addSpendingKeys";
-import { bridgeToDefi } from "./defiBridge";
+import { ethConnector } from "./defiConnector";
 import { createLidoAdaptor } from "./defiAdaptors/lidoAdaptor";
 import { createElementAdaptor } from "./defiAdaptors/elementAdaptor";
 import { AZTEC_ASSETS } from "../config";
@@ -337,7 +337,7 @@ Ethereum interaction
 */
 
 async function defiInteraction() {
-  // find info about deployed bridge contracts on mainnet here
+  // find info about deployed connector contracts on mainnet here
   // https://github.com/AztecProtocol/aztec-connect-bridges
 
   const LidoId = sdk.getBridgeAddressId(
@@ -356,7 +356,7 @@ async function defiInteraction() {
     "0xC116ecc074040AbEdB2E11A4e84dEcDBA141F38f",
     false
   );
-  // Element bridge auxData is the tranche expiry time
+  // Element connector auxData is the tranche expiry time
   // https://github.com/AztecProtocol/aztec-connect-bridges/blob/2f85d04e445eebd508b666bc1e29bcbc9955ebb0/src/bridges/element/ElementBridge.sol#L129
   let elementAuxData = await elementAdaptor.getAuxData(
     AZTEC_ASSETS[1],
@@ -364,8 +364,8 @@ async function defiInteraction() {
     AZTEC_ASSETS[1],
     undefined
   );
-  // The Element bridge uses auxData, the Lido/Curve bridges do not
-  const elementBridge = new BridgeCallData(
+  // The Element connector uses auxData, the Lido/Curve connectors do not
+  const elementConnector = new BridgeCallData(
     ElementId,
     1,
     1,
@@ -381,10 +381,10 @@ async function defiInteraction() {
     "0x6B175474E89094C44Da98b954EedeAC495271d0F"
   );
 
-  let defiTxs = await bridgeToDefi(
+  let defiTxs = await ethConnector(
     accounts[defaultAccountIndex].privacyAccount,
     accounts[defaultAccountIndex].signer,
-    elementBridge,
+    elementConnector,
     // ETH_TOKEN_ADDRESS,
     // wstEthTokenAddress,
     daiTokenAddress,
