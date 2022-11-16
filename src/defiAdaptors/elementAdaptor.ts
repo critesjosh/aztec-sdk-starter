@@ -1,9 +1,9 @@
 // @ts-nocheck
-import { BridgeDataFieldGetters } from '@aztec/bridge-clients/client-dest/src/client/bridge-data';
+import { BridgeDataFieldGetters } from '@aztec/bridge-clients/client-dest/src/client/bridge-data.js';
 import {
     ElementBridgeData,
     ChainProperties,
-  } from '@aztec/bridge-clients/client-dest/src/client/element/element-bridge-data';
+  } from '@aztec/bridge-clients/client-dest/src/client/element/element-bridge-data.js';
   import { EthAddress } from '@aztec/sdk';
   
   export const createElementAdaptor = (

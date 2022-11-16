@@ -1,17 +1,21 @@
 {
-  "name": "AztecSdkStarter",
+  "name": "aztec-sdk-starter",
   "version": "1.0.0",
-  "main": "src/index.ts",
+  "main": "src/index.js",
   "license": "MIT",
+  "type": "module",
   "scripts": {
-    "go": "ts-node src/index.ts"
+    "go": "ts-node-esm src/index.ts"
   },
   "dependencies": {
-    "@aztec/sdk": "2.1.45",
+    "@aztec/sdk": "2.1.0-testnet.71",
     "@ethersproject/providers": "^5.4.2",
     "@ethersproject/wallet": "^5.6.0",
     "dotenv": "^16.0.1",
     "ethers": "^5.6.6",
     "ts-node": "^10.7.0"
+  },
+  "resolutions": {
+    "@aztec/bridge-clients": "0.1.63"
   }
 }

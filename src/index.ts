@@ -15,20 +15,22 @@ import {
   SdkFlavour,
 } from "@aztec/sdk";
 import { JsonRpcProvider } from "@ethersproject/providers";
-import { depositEthToAztec } from "./shieldAssets";
-import { registerAccount } from "./registerAccount";
-import { sendAsset } from "./transferNotes";
+import { depositEthToAztec } from "./shieldAssets.js";
+import { registerAccount } from "./registerAccount.js";
+import { sendAsset } from "./transferNotes.js";
 import { ethers } from "ethers";
 import { randomBytes } from "crypto";
-import { withdrawTokens } from "./withdrawNotes";
-import { migrate } from "./migrateAccount";
-import { recover } from "./recoverAccount";
-import { addSpendingKeys } from "./addSpendingKeys";
-import { bridgeToDefi } from "./defiBridge";
-import { createLidoAdaptor } from "./defiAdaptors/lidoAdaptor";
-import { createElementAdaptor } from "./defiAdaptors/elementAdaptor";
-import { AZTEC_ASSETS } from "../config";
-require("dotenv").config();
+import { withdrawTokens } from "./withdrawNotes.js";
+import { migrate } from "./migrateAccount.js";
+import { recover } from "./recoverAccount.js";
+import { addSpendingKeys } from "./addSpendingKeys.js";
+import { bridgeToDefi } from "./defiBridge.js";
+import { createLidoAdaptor } from "./defiAdaptors/lidoAdaptor.js";
+import { createElementAdaptor } from "./defiAdaptors/elementAdaptor.js";
+import { AZTEC_ASSETS } from "./config.js";
+import * as dotenv from "dotenv";
+
+dotenv.config();
 
 /*
 
@@ -39,7 +41,7 @@ const ETH_TOKEN_ADDRESS = EthAddress.ZERO;
 const ethersProvider = new JsonRpcProvider(process.env.ETHEREUM_HOST);
 const ethereumProvider: EthereumProvider = new EthersAdapter(ethersProvider);
 const walletProvider = new WalletProvider(ethereumProvider);
-walletProvider.addAccountsFromMnemonic(process.env.MNEMONIC, 2); // add as many accounts as you want, just make sure they're funded
+walletProvider.addAccountsFromMnemonic(process.env.MNEMONIC!, 2); // add as many accounts as you want, just make sure they're funded
 
 type AccountKeys = {
   privateKey: Buffer;
@@ -48,10 +50,10 @@ type AccountKeys = {
 
 // Account type just used in this script
 type Account = {
-  privacyAccountKeys: AccountKeys;
+  privacyAccountKeys: AccountKeys | null;
   spendingAccountKeys: Array<AccountKeys>;
-  privacyAccount: AztecSdkUser;
-  signer: SchnorrSigner;
+  privacyAccount: AztecSdkUser | null;
+  signer: SchnorrSigner | null;
 };
 
 /*
@@ -76,7 +78,7 @@ Sdk Setup
 
 const setupSdk = async () => {
   sdk = await createAztecSdk(walletProvider, {
-    serverUrl: process.env.ROLLUP_HOST,
+    serverUrl: process.env.ROLLUP_HOST!,
     pollInterval: 1000, // poll every 1s
     // memoryDb: true, // when false, saves chain data locally
     debug: "bb:*",
@@ -91,8 +93,8 @@ const setupSdk = async () => {
 const createKeysAndInitUsers = async () => {
   // create Account and Spending keys for Ethereum accounts in .env
   accounts = await Promise.all(
-    walletProvider.getAccounts().map(async (address) => {
-      let account = {
+    walletProvider.getAccounts().map(async (address: any) => {
+      let account: Account = {
         privacyAccountKeys: null,
         spendingAccountKeys: [],
         privacyAccount: null,
@@ -111,7 +113,7 @@ const createKeysAndInitUsers = async () => {
   await Promise.all(
     accounts.map(async (account) => {
       account.privacyAccount = await sdk.addUser(
-        account.privacyAccountKeys.privateKey
+        account.privacyAccountKeys!.privateKey
       );
       account.signer = await sdk.createSchnorrSigner(
         account.spendingAccountKeys[0].privateKey
@@ -123,17 +125,17 @@ const createKeysAndInitUsers = async () => {
   await Promise.all(
     accounts.map(async (account, index) => {
       console.log(
-        `account public key ${account.privacyAccount.id.toString()}`,
+        `account public key ${account.privacyAccount!.id.toString()}`,
         `user${index} privacy Account ETH balance`,
         sdk.fromBaseUnits(
           await sdk.getBalance(
-            account.privacyAccount.id,
+            account.privacyAccount!.id,
             sdk.getAssetIdBySymbol("ETH")
           )
         ),
         `spendable balance: ${sdk.fromBaseUnits({
           assetId: 0,
-          value: await sdk.getSpendableSum(account.privacyAccount.id, 0, true),
+          value: await sdk.getSpendableSum(account.privacyAccount!.id, 0, true),
         })}
         `
       );
@@ -147,7 +149,7 @@ const createKeysAndInitUsers = async () => {
   );
   const trustedThirdPartyPublicKey = thirdPartySigner.getPublicKey();
   recoveryPayloads = await sdk.generateAccountRecoveryData(
-    accounts[defaultAccountIndex].privacyAccount.id,
+    accounts[defaultAccountIndex].privacyAccount!.id,
     alias,
     [trustedThirdPartyPublicKey]
   );
@@ -162,7 +164,7 @@ Deposit
 async function depositAssets() {
   let txId = await depositEthToAztec(
     walletProvider.getAccounts()[defaultAccountIndex],
-    accounts[defaultAccountIndex].privacyAccount.id,
+    accounts[defaultAccountIndex].privacyAccount!.id,
     tokenQuantity,
     TxSettlementTime.INSTANT,
     sdk
@@ -184,10 +186,10 @@ async function registerSigner() {
   let recoveryPublicKey = recoveryPayloads[0].recoveryPublicKey;
 
   let { controller, txId } = await registerAccount(
-    accounts[defaultAccountIndex].privacyAccount.id, // public key of the account to register for
+    accounts[defaultAccountIndex].privacyAccount!.id, // public key of the account to register for
     alias,
-    accounts[defaultAccountIndex].privacyAccountKeys.privateKey, // private key used to register the signer
-    accounts[defaultAccountIndex].signer.getPublicKey(), // public key of the new signer
+    accounts[defaultAccountIndex].privacyAccountKeys!.privateKey, // private key used to register the signer
+    accounts[defaultAccountIndex].signer!.getPublicKey(), // public key of the new signer
     recoveryPublicKey, // public key of the recovery account
     ETH_TOKEN_ADDRESS, // used to get the ETH asset Id on Aztec
     tokenQuantity,     // deposit amount
@@ -214,8 +216,8 @@ async function addSpendingKeysToAccount() {
   let newSigner2 = await sdk.createSchnorrSigner(Buffer.alloc(32, 2, "hex"));
 
   let txId = await addSpendingKeys(
-    accounts[defaultAccountIndex].privacyAccount.id,
-    accounts[defaultAccountIndex].signer,
+    accounts[defaultAccountIndex].privacyAccount!.id,
+    accounts[defaultAccountIndex].signer!,
     newSigner1.getPublicKey(),
     newSigner2.getPublicKey(),
     TxSettlementTime.NEXT_ROLLUP,
@@ -234,17 +236,17 @@ Transfer
 
 async function transferAssets() {
   let txId = await sendAsset(
-    accounts[defaultAccountIndex].privacyAccount.id, // from
-    accounts[1].privacyAccount.id, // to
+    accounts[defaultAccountIndex].privacyAccount!.id, // from
+    accounts[1].privacyAccount!.id, // to
     ETH_TOKEN_ADDRESS, // assetId
     tokenQuantity, // amount
     TxSettlementTime.INSTANT, // speed
     sdk,
-    accounts[defaultAccountIndex].signer
+    accounts[defaultAccountIndex].signer!
   );
 
   console.log("transfer txId", txId.toString());
-  console.log(await accounts[defaultAccountIndex].privacyAccount.getTxs());
+  console.log(await accounts[defaultAccountIndex].privacyAccount!.getTxs());
 }
 
 /*
@@ -256,13 +258,13 @@ Withdraw
 
 async function withdrawAssets() {
   let txId = await withdrawTokens(
-    accounts[defaultAccountIndex].privacyAccount.id,
+    accounts[defaultAccountIndex].privacyAccount!.id,
     walletProvider.getAccounts()[defaultAccountIndex],
     ETH_TOKEN_ADDRESS,
     tokenQuantity,
     TxSettlementTime.INSTANT,
     sdk,
-    accounts[defaultAccountIndex].signer
+    accounts[defaultAccountIndex].signer!
   );
 
   console.log("withdraw txId", txId.toString());
@@ -285,8 +287,8 @@ async function migrateAccount() {
   let newRecoveryKey = await sdk.createSchnorrSigner(randomBytes(32));
 
   let txId = await migrate(
-    accounts[defaultAccountIndex].privacyAccount.id,
-    accounts[defaultAccountIndex].signer,
+    accounts[defaultAccountIndex].privacyAccount!.id,
+    accounts[defaultAccountIndex].signer!,
     newSpendingKey.getPublicKey(),
     newRecoveryKey.getPublicKey(),
     newAccountPrivateKey,
@@ -310,7 +312,7 @@ Recover a registered account
 async function recoverAccount() {
   if (
     (await sdk.isAccountRegistered(
-      accounts[defaultAccountIndex].privacyAccount.id
+      accounts[defaultAccountIndex].privacyAccount!.id
     )) === false
   ) {
     throw new Error("account must be registered before it can be recovered");
@@ -358,11 +360,11 @@ async function defiInteraction() {
   );
   // Element bridge auxData is the tranche expiry time
   // https://github.com/AztecProtocol/aztec-connect-bridges/blob/2f85d04e445eebd508b666bc1e29bcbc9955ebb0/src/bridges/element/ElementBridge.sol#L129
-  let elementAuxData = await elementAdaptor.getAuxData(
-    AZTEC_ASSETS[1],
-    undefined,
-    AZTEC_ASSETS[1],
-    undefined
+  let elementAuxData = await elementAdaptor.getAuxData!(
+    AZTEC_ASSETS[1], // DAI
+    AZTEC_ASSETS[3], // NOT_USED
+    AZTEC_ASSETS[1],  // DAI
+    AZTEC_ASSETS[3] // NOT_USED
   );
   // The Element bridge uses auxData, the Lido/Curve bridges do not
   const elementBridge = new BridgeCallData(
@@ -371,7 +373,7 @@ async function defiInteraction() {
     1,
     undefined,
     undefined,
-    Number(elementAuxData[0])
+    BigInt(elementAuxData[0])
   ); // IN: DAI (1), OUT: DAI (1)
 
   const wstEthTokenAddress = EthAddress.fromString(
@@ -382,8 +384,8 @@ async function defiInteraction() {
   );
 
   let defiTxs = await bridgeToDefi(
-    accounts[defaultAccountIndex].privacyAccount,
-    accounts[defaultAccountIndex].signer,
+    accounts[defaultAccountIndex].privacyAccount!,
+    accounts[defaultAccountIndex].signer!,
     elementBridge,
     // ETH_TOKEN_ADDRESS,
     // wstEthTokenAddress,
@@ -400,7 +402,7 @@ async function main() {
   await createKeysAndInitUsers();
   // await registerSigner();
   // await addSpendingKeysToAccount();
-  // await depositAssets();
+  await depositAssets();
   // await transferAssets();
   // await withdrawAssets();
   // await recoverAccount();
