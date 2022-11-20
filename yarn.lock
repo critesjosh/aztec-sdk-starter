@@ -2,26 +2,6 @@
 # yarn lockfile v1
 
 
-"@aztec/barretenberg@2.1.0-testnet.71":
-  version "2.1.0-testnet.71"
-  resolved "https://registry.yarnpkg.com/@aztec/barretenberg/-/barretenberg-2.1.0-testnet.71.tgz#0eec0c62afa7ead04c1468d35de7f644c1380bde"
-  integrity sha512-h7q6pqtxvSaLJIKVRTjIZDux3kMX2JyECxlu3M8OAXztrKtRGkKt1FWMaaCMzPWA+A5aIUXG1tyFwS3elrr8bg==
-  dependencies:
-    "@types/levelup" "^4.3.0"
-    browserify-cipher "^1.0.1"
-    cross-fetch "^3.1.5"
-    debug "^4.3.4"
-    detect-node "^2.1.0"
-    fs-extra "10.0.0"
-    hash.js "^1.1.7"
-    leveldown "^6.1.1"
-    levelup "^5.1.1"
-    memdown "^6.1.1"
-    promise-readable "^5.0.4"
-    sha3 "^2.1.3"
-    supports-color "7.2.0"
-    tslib "^2.0.0"
-
 "@aztec/barretenberg@2.1.37":
   version "2.1.37"
   resolved "https://registry.yarnpkg.com/@aztec/barretenberg/-/barretenberg-2.1.37.tgz#aa87d92ca90a062023ba95bfb0d04aeab67cd930"
@@ -42,13 +22,33 @@
     threads "1.7.0"
     tslib "^2.0.0"
 
-"@aztec/blockchain@2.1.0-testnet.71":
-  version "2.1.0-testnet.71"
-  resolved "https://registry.yarnpkg.com/@aztec/blockchain/-/blockchain-2.1.0-testnet.71.tgz#150c582d336cd96adb48ab682f0bc3aee3f8d076"
-  integrity sha512-jDJrOBQ4aGQ4DSoDMWPolVSzjhK6HP7J27C+82qvgDyxedtfYTeaLAl9PSxxFQ701UeneyNRMg2QY3vpI6feyg==
+"@aztec/barretenberg@2.1.52":
+  version "2.1.52"
+  resolved "https://registry.yarnpkg.com/@aztec/barretenberg/-/barretenberg-2.1.52.tgz#0456d80e893535f0429d8d90d421797a2dedb250"
+  integrity sha512-kCrMBTyBtdsfQHcGQbjL4LoUZFikG/3gfqCGzRSx/dGZIl/1ktG7WachrMGcFliAVEYBloSVV3++6cd1broKnA==
   dependencies:
-    "@aztec/barretenberg" "2.1.0-testnet.71"
-    "@aztec/bridge-clients" "2.1.0-testnet.71"
+    "@types/levelup" "^4.3.0"
+    browserify-cipher "^1.0.1"
+    cross-fetch "^3.1.5"
+    debug "^4.3.4"
+    detect-node "^2.1.0"
+    fs-extra "10.0.0"
+    hash.js "^1.1.7"
+    leveldown "^6.1.1"
+    levelup "^5.1.1"
+    memdown "^6.1.1"
+    promise-readable "^5.0.4"
+    sha3 "^2.1.3"
+    supports-color "7.2.0"
+    tslib "^2.0.0"
+
+"@aztec/blockchain@2.1.52":
+  version "2.1.52"
+  resolved "https://registry.yarnpkg.com/@aztec/blockchain/-/blockchain-2.1.52.tgz#2244191b7dccf0eb1b919dad20456e34baf6146d"
+  integrity sha512-5y6LcLmJB6k7i7Fb2CUrkdlFntU/NS6iDAcmkKPVP8cg3K4W3UvO08spT5nikrTFsNmIXeqTh/GcZsvdPABBZw==
+  dependencies:
+    "@aztec/barretenberg" "2.1.52"
+    "@aztec/bridge-clients" "2.1.52"
     "@ethersproject/abstract-provider" "5.5.1"
     "@ethersproject/contracts" "5.5.0"
     "@ethersproject/experimental" "5.5.0"
@@ -63,7 +63,7 @@
     ethers "5.5.1"
     sha3 "^2.1.4"
 
-"@aztec/bridge-clients@0.1.63", "@aztec/bridge-clients@2.1.0-testnet.71":
+"@aztec/bridge-clients@0.1.63", "@aztec/bridge-clients@2.1.52":
   version "0.1.63"
   resolved "https://registry.yarnpkg.com/@aztec/bridge-clients/-/bridge-clients-0.1.63.tgz#bd840a1d1887095f9012cf93e4e70ed98d629da3"
   integrity sha512-hv/RrfBJaqBPm8OFCpFkSMKVLQNb4z1iP84MJMVeS4zX7yk2e4giksU129kVINSEx6CDxfd/xxuc05O9P/WOuw==
@@ -80,13 +80,13 @@
     typechain "^7.0.1"
     typescript "^4.7.4"
 
-"@aztec/sdk@2.1.0-testnet.71":
-  version "2.1.0-testnet.71"
-  resolved "https://registry.yarnpkg.com/@aztec/sdk/-/sdk-2.1.0-testnet.71.tgz#21c5e297c9c92cb576cad8a70e63c3836f9b9174"
-  integrity sha512-rKmFqgjleIzsm9qL3urmxHC7qwwRdwycacZ06KUqhfn7v9BGBSCgyF5OPD7Cn1802rCVzbPWJTuDexQYLjd+Og==
+"@aztec/sdk@2.1.52":
+  version "2.1.52"
+  resolved "https://registry.yarnpkg.com/@aztec/sdk/-/sdk-2.1.52.tgz#eb1d7c1e12551fd762d2884e477788ce2663d9e8"
+  integrity sha512-kbOcFo9GDb3zbMxmhoZwDAxo8zjhdncMQvPtJSUwtO6Z6P6zXUfx1HzMvJu3O2LeAjFhDgDkHwPW9sJc6CpBkQ==
   dependencies:
-    "@aztec/barretenberg" "2.1.0-testnet.71"
-    "@aztec/blockchain" "2.1.0-testnet.71"
+    "@aztec/barretenberg" "2.1.52"
+    "@aztec/blockchain" "2.1.52"
     detect-node "^2.1.0"
     dexie "3.0.1"
     events "^3.3.0"
@@ -4022,9 +4022,9 @@ serve-handler@6.1.5:
     range-parser "1.2.0"
 
 serve@^14.0.1:
-  version "14.1.1"
-  resolved "https://registry.yarnpkg.com/serve/-/serve-14.1.1.tgz#17d299f2ec78ae022760e9fa63d122336fe0a1bc"
-  integrity sha512-7RhRDEirZ7Qyee4QWhBHO9qRtjIGsIPGecDDPzNzlOsjDiZWcq36GS8FioVJAuJPVJBBDTsGp33WWOO4B9A82g==
+  version "14.1.2"
+  resolved "https://registry.yarnpkg.com/serve/-/serve-14.1.2.tgz#65d7a3cec5a0b876c46bb8927fabc27957c2e1e0"
+  integrity sha512-luwVfJwbeE7dhCKeRU0vIBpt4bXdbAfzwsWJIQ5eqrIW2e+4nLWXbSlZ0WzelSFHQq+FlueOW6dr90jEewS9zw==
   dependencies:
     "@zeit/schemas" "2.21.0"
     ajv "8.11.0"

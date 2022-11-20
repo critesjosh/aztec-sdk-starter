@@ -8,7 +8,7 @@
     "go": "ts-node-esm src/index.ts"
   },
   "dependencies": {
-    "@aztec/sdk": "2.1.0-testnet.71",
+    "@aztec/sdk": "2.1.52",
     "@ethersproject/providers": "^5.4.2",
     "@ethersproject/wallet": "^5.6.0",
     "dotenv": "^16.0.1",
